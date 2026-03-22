@@ -1,0 +1,20 @@
+{
+  "skills": {
+    "typescript-magician": {
+      "name": "typescript-magician",
+      "repo": "mcollina/skills",
+      "path": "skills/typescript-magician",
+      "ref": "3e2ffbb",
+      "commit": "3e2ffbb90fda9e31d84011c765252b00bfc2d4d6",
+      "timestamp": "2026-03-22T16:14:59.615Z"
+    },
+    "jest": {
+      "name": "jest",
+      "repo": "Mindrally/skills",
+      "path": "jest",
+      "ref": "47f47c1",
+      "commit": "47f47c12e62f62b5e171bd5af61d0fc24b329701",
+      "timestamp": "2026-03-22T16:15:00.347Z"
+    }
+  }
+}

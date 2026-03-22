@@ -1,0 +1,51 @@
+{
+  "name": "skillset-cli",
+  "version": "0.1.0",
+  "description": "Deterministic AI skill dependency manager",
+  "type": "commonjs",
+  "bin": {
+    "skillset": "dist/bin/skillset.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "cli": "ts-node bin/skillset.ts",
+    "test": "jest",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write ."
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "keywords": [
+    "cli",
+    "skills",
+    "ai",
+    "agents"
+  ],
+  "author": "Abdeldjalil Fortas (Fcmam5)",
+  "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
+    "execa": "^9.6.1"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/Fcmam5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^1.2.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.4.0",
+    "jest": "^30.3.0",
+    "prettier": "^3.8.1",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  }
+}

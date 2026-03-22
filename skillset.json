@@ -1,0 +1,17 @@
+{
+  "$schema": "./skillset.schema.json",
+  "skills": [
+    {
+      "name": "typescript-magician",
+      "repo": "mcollina/skills",
+      "path": "skills/typescript-magician",
+      "ref": "3e2ffbb"
+    },
+    {
+      "name": "jest",
+      "repo": "Mindrally/skills",
+      "path": "jest",
+      "ref": "47f47c1"
+    }
+  ]
+}
