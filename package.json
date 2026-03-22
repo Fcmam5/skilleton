@@ -1,6 +1,6 @@
 {
   "name": "skilleton",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Skills skeleton: deterministic AI skill dependency manager",
   "type": "commonjs",
   "bin": {
@@ -11,7 +11,8 @@
     "cli": "ts-node bin/skilleton.ts",
     "test": "jest",
     "lint": "eslint --config eslint.config.cjs . --ext .ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepack": "npm run build"
   },
   "engines": {
     "node": ">=24.0.0"
