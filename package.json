@@ -1,8 +1,9 @@
 {
   "name": "skilleton",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Skills skeleton: deterministic AI skill dependency manager",
   "type": "commonjs",
+  "private": false,
   "bin": {
     "skilleton": "dist/bin/skilleton.js"
   },

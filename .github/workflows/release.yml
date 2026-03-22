@@ -5,6 +5,7 @@ on:
     types: [published]
 
 jobs:
+
   publish:
     runs-on: ubuntu-latest
     environment:
@@ -26,10 +27,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test -- --runInBand
+
       - name: Build
         run: npm run build
 
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --provenance
+        run: npm publish --access public
