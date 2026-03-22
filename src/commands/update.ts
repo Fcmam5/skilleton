@@ -1,9 +1,9 @@
 import { Command, CommandArgs } from './types';
-import { SkillsetEnvironment } from '../env';
+import { SkilletonEnvironment } from '../env';
 import { getChangedSkills, serializeLockfile } from '../core/lock';
 
 export class UpdateCommand implements Command {
-  async run(env: SkillsetEnvironment, args: CommandArgs): Promise<void> {
+  async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     const manifest = await env.manifestRepo.readManifest();
     env.validator.validate(manifest);
 
@@ -25,7 +25,7 @@ export class UpdateCommand implements Command {
     }
 
     await env.manifestRepo.writeLockfile(serializeLockfile(resolved));
-    console.log('skillset.lock.json updated. Reinstalling changed skills...');
+    console.log('skilleton.lock.json updated. Reinstalling changed skills...');
 
     const agentFlag = typeof args.flags.agent === 'string' ? (args.flags.agent as string) : undefined;
     const results = await env.installer.install(changed, {

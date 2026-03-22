@@ -1,14 +1,14 @@
 import { Command, CommandArgs } from './types';
 import { parseSkillInput } from '../core/parse';
 import { SkillManifest, SkillDescriptor } from '../core/types';
-import { SkillsetEnvironment } from '../env';
+import { SkilletonEnvironment } from '../env';
 import { InstallCommand } from './install';
 
 export class AddCommand implements Command {
-  async run(env: SkillsetEnvironment, args: CommandArgs): Promise<void> {
+  async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     const [input] = args.positional;
     if (!input) {
-      throw new Error('Usage: skillset add <owner/skill[@ref]>');
+      throw new Error('Usage: skilleton add <owner/skill[@ref]>');
     }
 
     const descriptor = parseSkillInput(input);

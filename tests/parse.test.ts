@@ -5,7 +5,7 @@ describe('parseSkillInput', () => {
     const result = parseSkillInput('mindrally/jest');
     expect(result).toEqual({
       name: 'jest',
-      repo: 'mindrally/skills',
+      repo: 'https://github.com/mindrally/skills',
       path: 'jest',
       ref: 'main',
     });
@@ -15,7 +15,7 @@ describe('parseSkillInput', () => {
     const result = parseSkillInput('Mindrally/skills/chrome-extension-development@v1.0.0');
     expect(result).toEqual({
       name: 'chrome-extension-development',
-      repo: 'Mindrally/skills',
+      repo: 'https://github.com/Mindrally/skills',
       path: 'chrome-extension-development',
       ref: 'v1.0.0',
     });
@@ -25,9 +25,19 @@ describe('parseSkillInput', () => {
     const result = parseSkillInput('acme/ai-skills/agents/rag@dev');
     expect(result).toEqual({
       name: 'rag',
-      repo: 'acme/ai-skills',
+      repo: 'https://github.com/acme/ai-skills',
       path: 'agents/rag',
       ref: 'dev',
+    });
+  });
+
+  it('accepts full repository URLs for non-GitHub hosts', () => {
+    const result = parseSkillInput('https://gitlab.com/org/skills/agents/vector@release');
+    expect(result).toEqual({
+      name: 'vector',
+      repo: 'https://gitlab.com/org/skills',
+      path: 'agents/vector',
+      ref: 'release',
     });
   });
 

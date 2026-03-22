@@ -1,11 +1,11 @@
 import { Command, CommandArgs } from './types';
-import { SkillsetEnvironment } from '../env';
-import { LockedSkill } from '../core/types';
+import { SkilletonEnvironment } from '../env';
+import { LockedSkill, SkillDescriptor } from '../core/types';
 import { SkillValidationError } from '../core/errors';
 import { serializeLockfile } from '../core/lock';
 
 export class InstallCommand implements Command {
-  async run(env: SkillsetEnvironment, args: CommandArgs): Promise<void> {
+  async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     const manifest = await env.manifestRepo.readManifest();
     env.validator.validate(manifest);
 
@@ -14,17 +14,17 @@ export class InstallCommand implements Command {
 
     let lockedSkills: LockedSkill[];
     if (useLock && existingLock) {
-      lockedSkills = manifest.skills.map((skill) => {
+      lockedSkills = manifest.skills.map((skill: SkillDescriptor) => {
         const locked = existingLock.skills[skill.name];
         if (!locked) {
-          throw new SkillValidationError(`Skill ${skill.name} missing from lockfile. Run "skillset update".`);
+          throw new SkillValidationError(`Skill ${skill.name} missing from lockfile. Run "skilleton update".`);
         }
         return locked;
       });
     } else {
       lockedSkills = await env.resolver.resolve(manifest.skills);
       await env.manifestRepo.writeLockfile(serializeLockfile(lockedSkills));
-      console.log('Created skillset.lock.json');
+      console.log('Created skilleton.lock.json');
     }
 
     const agentFlag = this.parseAgentFlag(args);

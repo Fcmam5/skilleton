@@ -6,7 +6,7 @@ import { ExecaGitClient } from './adapters/git';
 import { SkillResolver } from './core/resolve';
 import { SkillInstaller } from './core/install';
 
-export interface SkillsetEnvironment {
+export interface SkilletonEnvironment {
   fs: NodeFileSystem;
   validator: ManifestValidator;
   manifestRepo: ManifestRepository;
@@ -16,7 +16,7 @@ export interface SkillsetEnvironment {
   installer: SkillInstaller;
 }
 
-export function createEnvironment(cwd: string = process.cwd()): SkillsetEnvironment {
+export function createEnvironment(cwd: string = process.cwd()): SkilletonEnvironment {
   const fs = new NodeFileSystem();
   const validator = new ManifestValidator();
   const manifestRepo = new ManifestRepository(fs, cwd);

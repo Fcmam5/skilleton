@@ -17,7 +17,8 @@ export function isRepoUrl(spec: string): boolean {
 }
 
 export function normalizeRepoUrl(url: string): string {
-  return url.replace(/\.git$/, '').replace(/\/+$/, '');
+  const withoutTrailingSlash = url.replace(/\/+$/, '');
+  return withoutTrailingSlash.replace(/\.git$/i, '');
 }
 
 export function ensureRepoUrl(spec: string): string {

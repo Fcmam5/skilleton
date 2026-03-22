@@ -1,4 +1,4 @@
-import { SkillsetEnvironment } from '../env';
+import { SkilletonEnvironment } from '../env';
 
 export interface CommandArgs {
   positional: string[];
@@ -6,5 +6,5 @@ export interface CommandArgs {
 }
 
 export interface Command {
-  run(env: SkillsetEnvironment, args: CommandArgs): Promise<void>;
+  run(env: SkilletonEnvironment, args: CommandArgs): Promise<void>;
 }

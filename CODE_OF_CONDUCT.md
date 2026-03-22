@@ -1,8 +1,8 @@
-# Skillset CLI Code of Conduct
+# Skilleton CLI Code of Conduct
 
 ## Our Pledge
 
-We as members, contributors, and leaders pledge to make participation in the Skillset CLI community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, gender, level of experience, education, socioeconomic status, nationality, personal appearance, race, religion, or technical stack preference.
+We as members, contributors, and leaders pledge to make participation in the Skilleton CLI community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, gender, level of experience, education, socioeconomic status, nationality, personal appearance, race, religion, or technical stack preference.
 
 ## Our Standards
 
@@ -77,7 +77,7 @@ This project was initially bootstrapped using AI assistance to establish the fou
 If you witness or experience conduct that violates this code, please report it to:
 
 - Email: `au54vz9rk[at]mozmail[.]com`
-- GitHub: [Create a private issue with maintainers](https://github.com/fcmam5/skillset/issues/new?assignees=&labels=&template=security_report.md&title=Security+Report)
+- GitHub: [Create a private issue with maintainers](https://github.com/fcmam5/skilleton/issues/new?assignees=&labels=&template=security_report.md&title=Security+Report)
 
 All reports will be reviewed and investigated in a timely and confidential manner.
 
@@ -101,8 +101,8 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 
 For questions about this Code of Conduct, please contact:
 - Email: `au54vz9rk[at]mozmail[.]com`
-- GitHub: [Create an issue](https://github.com/fcmam5/skillset/issues/new)
+- GitHub: [Create an issue](https://github.com/fcmam5/skilleton/issues/new)
 
 ---
 
-Thank you for helping make Skillset CLI a welcoming and productive community for everyone!
+Thank you for helping make Skilleton CLI a welcoming and productive community for everyone!

@@ -25,7 +25,7 @@ export class SkillResolver {
       }
 
       if (options.strictLock && !locked) {
-        throw new SkillValidationError(`Skill ${descriptor.name} missing from lockfile. Run "skillset update".`);
+        throw new SkillValidationError(`Skill ${descriptor.name} missing from lockfile. Run "skilleton update".`);
       }
 
       const commit = await this.github.resolveCommit(descriptor.repo, descriptor.ref);

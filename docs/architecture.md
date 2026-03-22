@@ -1,10 +1,10 @@
-# Skillset Architecture
+# Skilleton Architecture
 
-Skillset follows a layered, testable architecture grounded in ports/adapters.
+Skilleton follows a layered, testable architecture grounded in ports/adapters.
 
 ```mermaid
 flowchart TD
-  CLI[CLI Entrypoint<br/>bin/skillset.ts]
+  CLI[CLI Entrypoint<br/>bin/skilleton.ts]
   Commands[Commands Layer<br/>src/commands]
   Core[Domain Core<br/>src/core]
   Adapters[Adapters<br/>src/adapters]
@@ -17,7 +17,7 @@ flowchart TD
 
 ## Layering
 
-1. **CLI (bin/skillset.ts)**: Parses process arguments, delegates to command handlers, and formats output.
+1. **CLI (bin/skilleton.ts)**: Parses process arguments, delegates to command handlers, and formats output.
 2. **Application Services (src/commands)**: One per command (`add`, `install`, `update`, `list`, `audit`). Services orchestrate use cases, operate on repositories, and return rich result objects.
 3. **Domain Core (src/core)**:
    - `parse.ts`: Input normalization from `<owner>/<skill>[@ref]` or any repo URL into structured `SkillDescriptor` objects.
@@ -42,14 +42,14 @@ sequenceDiagram
   participant Adapt as Git/GitHub Adapters
   participant FS as FS/Lockfile
 
-  User->>CLI: skillset add owner/skill@ref
+  User->>CLI: skilleton add owner/skill@ref
   CLI->>Cmd: parse argv
   Cmd->>Core: parseSkillInput
   Core->>FS: read/initialize manifest
   Core->>Core: normalizeDescriptor (repos.ts)
   Core->>FS: write manifest
   Cmd->>User: "Added skill..."
-  User->>CLI: skillset install
+  User->>CLI: skilleton install
   CLI->>Cmd: dispatch install
   Cmd->>FS: load manifest & lockfile
   Cmd->>Core: resolve commits
@@ -65,7 +65,7 @@ This diagram highlights that manifest writes always pass through `normalizeDescr
 
 - User inputs can be slugs (`owner/skill`) or full URLs (GitHub, GitLab, Bitbucket, self-hosted). `src/core/repos.ts` normalizes everything into HTTPS URLs.
 - Cache key = sanitized, normalized repo URL (e.g., `https___github_com_owner_skills`).
-- Cache root: `~/.skillset/cache/<cacheKey>`.
+- Cache root: `~/.skilleton/cache/<cacheKey>`.
 - Clone once per repo, then `git fetch --prune --force` on subsequent installs.
 - Extract skill directories via worktrees + filesystem copy, guaranteeing deterministic installs.
 - Idempotent installs: target skill folder is removed before copy; lockfile commit pins guarantee reproducibility.
@@ -77,17 +77,17 @@ flowchart LR
   repos(repos.ts helpers)
   manifest(ManifestRepository)
   lock(lockfile)
-  cache(~/.skillset/cache)
+  cache(~/.skilleton/cache)
 
   input --> parse --> repos --> manifest
   manifest --> lock
   manifest --> cache
-  cache --> install[Install Path .skillset/skills]
+  cache --> install[Install Path .skilleton/skills]
 ```
 
 ## Validation
 
-- `skillset.schema.json` enforces manifest structure and now accepts either URLs or `owner/repo` slugs for `repo` fields.
+- `skilleton.schema.json` enforces manifest structure and now accepts either URLs or `owner/repo` slugs for `repo` fields.
 - Additional runtime checks guarantee unique names and consistent repo/path combos.
 - `repos.ts` ensures all manifests + lockfiles serialize normalized URLs, preventing prompt-injection via repo aliasing.
 - Errors bubble up as typed exceptions with user-friendly messages.

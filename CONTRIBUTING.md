@@ -1,10 +1,10 @@
-# Contributing to Skillset CLI
+# Contributing to Skilleton CLI
 
 Thanks for helping build a better deterministic skill dependency manager! This guide explains how to propose changes, what we expect in pull requests, and how to keep the project fast, private, and maintainable.
 
 ## Before You Start
 
-1. Read the [Skillset CLI Code of Conduct](CODE_OF_CONDUCT.md) and AI usage rules.
+1. Read the [Skilleton CLI Code of Conduct](CODE_OF_CONDUCT.md) and AI usage rules.
 2. Look through existing issues/discussions to avoid duplicates.
 3. Open an issue describing the bug/feature before writing code—design upfront keeps the CLI minimal.
 4. All contributions must be made and reviewed by humans. AI tooling can assist but cannot directly author PRs.
@@ -14,13 +14,13 @@ Thanks for helping build a better deterministic skill dependency manager! This g
 ### Reporting Bugs
 
 - Use the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.md).
-- Include CLI version (`skillset --version`), Node.js version, OS, and shell.
+- Include CLI version (`skilleton --version`), Node.js version, OS, and shell.
 - Provide the manifest/lockfile snippets or redacted stack traces needed to reproduce.
 
 ### Suggesting Features
 
 - Use the [Feature Request template](.github/ISSUE_TEMPLATE/feature_request.md).
-- Describe the workflow pain point and how it fits with Skillset’s minimal/deterministic philosophy.
+- Describe the workflow pain point and how it fits with Skilleton's minimal/deterministic philosophy.
 - Prototype ideas in discussions before writing code when changes are large.
 
 ### Submitting Changes
@@ -45,8 +45,8 @@ Thanks for helping build a better deterministic skill dependency manager! This g
 ### Local Development
 
 ```bash
-git clone https://github.com/fcmam5/skillset.git
-cd skillset
+git clone https://github.com/fcmam5/skilleton.git
+cd skilleton
 npm install
 npm run build
 npm run cli -- --help
@@ -67,8 +67,8 @@ During development you can run the TypeScript sources directly with `npm run cli
 ### Manual Testing
 
 - Run `npm run cli add <owner/skill>` in a throwaway directory to ensure manifests/lockfiles behave.
-- Verify `skillset install/update/list` flows when manifests include multiple skills from the same repo.
-- Check the cache at `~/.skillset/cache` and installs under `.skillset/skills` when testing installer changes.
+- Verify `skilleton install/update/list` flows when manifests include multiple skills from the same repo.
+- Check the cache at `~/.skilleton/cache` and installs under `.skilleton/skills` when testing installer changes.
 
 ### What to Test Before Submitting
 
@@ -113,10 +113,10 @@ Use the [PR template](.github/PULL_REQUEST_TEMPLATE.md) and include:
 
 ## Architecture Notes
 
-- `bin/skillset.ts` wires CLI commands to the environment factory in `src/env.ts`.
+- `bin/skilleton.ts` wires CLI commands to the environment factory in `src/env.ts`.
 - `src/core/` contains domain logic: parse, validate, resolve, install, lockfile helpers.
 - `src/adapters/` isolate side effects (filesystem, git, GitHub API).
-- Cache directory: `~/.skillset/cache`; installed skills live under `.skillset/skills` with optional per-agent symlinks.
+- Cache directory: `~/.skilleton/cache`; installed skills live under `.skilleton/skills` with optional per-agent symlinks.
 
 When adding new commands or adapters, keep boundaries clear and write focused tests under `tests/`.
 
@@ -144,4 +144,4 @@ When adding new commands or adapters, keep boundaries clear and write focused te
 
 ---
 
-Thank you for contributing to Skillset CLI! Together we can keep AI skills as reproducible and privacy-friendly as the rest of your stack.
+Thank you for contributing to Skilleton CLI! Together we can keep AI skills as reproducible and privacy-friendly as the rest of your stack.

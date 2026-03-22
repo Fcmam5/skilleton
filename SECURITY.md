@@ -6,11 +6,11 @@
 |---------|-----------|
 | 0.1.x   | ✅        |
 
-Skillset CLI is currently pre-1.0, but we treat every tagged release as security-supported until a newer patch is published.
+Skilleton CLI is currently pre-1.0, but we treat every tagged release as security-supported until a newer patch is published.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Skillset CLI, please report it responsibly.
+If you discover a security vulnerability in Skilleton CLI, please report it responsibly.
 
 ### How to Report
 
@@ -23,7 +23,7 @@ Instead, email `au54vz9rk[at]mozmail[.]com` with the details. If you do not rece
 - A clear description of the issue and potential impact
 - Steps to reproduce and any sample manifests or skill repos used
 - Logs, stack traces, or screenshots if available
-- Environment details (OS, Node.js version, Skillset CLI version)
+- Environment details (OS, Node.js version, Skilleton CLI version)
 - Suggested mitigations, if you have any
 
 ### Response Process
@@ -39,11 +39,11 @@ We may invite you to test the fix before release if appropriate.
 
 This policy covers:
 
-- The Skillset CLI source code (`bin/`, `src/`, `tests/`)
+- The Skilleton CLI source code (`bin/`, `src/`, `tests/`)
 - Packaged releases published to npm
-- JSON schemas (e.g., `skillset.schema.json`) and manifest parsing/validation
-- Git/GitHub adapters, caching, and installation paths (`~/.skillset/cache`, `.skillset/skills`)
-- Configuration files distributed with the project (e.g., `skillset.json`, `skillset.lock.json` generation)
+- JSON schemas (e.g., `skilleton.schema.json`) and manifest parsing/validation
+- Git/GitHub adapters, caching, and installation paths (`~/.skilleton/cache`, `.skilleton/skills`)
+- Configuration files distributed with the project (e.g., `skilleton.json`, `skilleton.lock.json` generation)
 
 Out of scope:
 
@@ -54,10 +54,10 @@ Out of scope:
 
 ## Security Expectations
 
-- **No telemetry**: Skillset CLI does not phone home or send metrics.
+- **No telemetry**: Skilleton CLI does not phone home or send metrics.
 - **Principle of least privilege**: git operations run using local credentials you provide; we never request additional permissions.
-- **Deterministic installs**: `skillset.lock.json` pins exact commits to prevent prompt injection and supply-chain surprises.
-- **Filesystem isolation**: skills install under `.skillset/skills/<name>` with symlinks per agent, avoiding arbitrary execution from temporary paths.
+- **Deterministic installs**: `skilleton.lock.json` pins exact commits to prevent prompt injection and supply-chain surprises.
+- **Filesystem isolation**: skills install under `.skilleton/skills/<name>` with symlinks per agent, avoiding arbitrary execution from temporary paths.
 - **Input validation**: manifests are validated against a strict JSON schema before any install occurs.
 
 ## Coordinated Disclosure & Recognition
@@ -72,4 +72,4 @@ We will not pursue legal action against good-faith researchers who follow this p
 - Run `npm test` and `npm run build` before publishing or distributing custom builds.
 - Monitor this repository’s releases for security advisories.
 
-Thank you for helping keep Skillset CLI safe for everyone!
+Thank you for helping keep Skilleton CLI safe for everyone!

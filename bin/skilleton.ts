@@ -53,7 +53,7 @@ function parseArgs(argv: string[]): { command: string | null; args: CommandArgs 
 
 function printHelp(): void {
   console.log(
-    `Skillset CLI\n\nUsage:\n  skillset <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skillset.json\n  install [--agent <name>]    Install skills defined in skillset.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list                        Show declared skills and pinned commits\n  audit                       Placeholder for future audit functionality\n\nRun "skillset <command> --help" for details.\n`,
+    `Skilleton — Skills Skeleton\n\nUsage:\n  skilleton <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skilleton.json\n  install [--agent <name>]    Install skills defined in skilleton.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list                        Show declared skills and pinned commits\n  audit                       Placeholder for future audit functionality\n\nRun "skilleton <command> --help" for details.\n`,
   );
 }
 

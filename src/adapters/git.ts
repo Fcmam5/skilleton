@@ -31,7 +31,7 @@ export class ExecaGitClient implements GitClient {
   }
 
   async exportPath(repoPath: string, commit: string, destination: string, subPath?: string): Promise<void> {
-    const worktreeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skillset-wt-'));
+    const worktreeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skilleton-wt-'));
     try {
       await execa('git', ['-C', repoPath, 'worktree', 'add', '--force', '--detach', worktreeDir, commit]);
 

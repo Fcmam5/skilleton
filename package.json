@@ -1,16 +1,16 @@
 {
-  "name": "skillset-cli",
+  "name": "skilleton",
   "version": "0.1.0",
-  "description": "Deterministic AI skill dependency manager",
+  "description": "Skills skeleton: deterministic AI skill dependency manager",
   "type": "commonjs",
   "bin": {
-    "skillset": "dist/bin/skillset.js"
+    "skilleton": "dist/bin/skilleton.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "cli": "ts-node bin/skillset.ts",
+    "cli": "ts-node bin/skilleton.ts",
     "test": "jest",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint --config eslint.config.cjs . --ext .ts",
     "format": "prettier --write ."
   },
   "engines": {

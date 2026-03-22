@@ -1,17 +1,21 @@
-# Skillset
+# Skilleton
 
-Skillset is a lightweight CLI that treats AI skills like deterministic project dependencies. Think `package.json`, `vscode/extensions.json`, or other project-scoped manifests—except the entries point to versioned `SKILL.md` folders that can be shared, reviewed, and upgraded with confidence. Vercel's `skills.sh` inspired parts of the DX, but Skillset differentiates itself with project-first manifests and strict version locking.
+**Skilleton** is a skills skeleton — a lightweight CLI that treats AI skills like deterministic project dependencies. Think `package.json`, `vscode/extensions.json`, or other project-scoped manifests—except the entries point to versioned `SKILL.md` folders that can be shared, reviewed, and upgraded with confidence. Vercel's `skills.sh` inspired parts of the DX, but Skilleton differentiates itself with project-first manifests and strict version locking.
+
+## Why "Skilleton"?
+
+The name "Skilleton" comes from **"skills skeleton"** — it provides the structural framework for managing AI skill dependencies in your projects. Everyone else was already using "[skillset](https://www.npmjs.com/package/skillset)", "[skillsets](https://www.npmjs.com/package/skillsets)", "[Skillful](https://www.npmjs.com/package/skillful)", and similar names, so we went with something that captures the essence: a minimal, skeletal structure that holds your skills together.
 
 ## Installation
 
 ```bash
-npm install -g skillset-cli
+npm install -g skilleton
 ```
 
 Or using npx:
 
 ```bash
-npx skillset-cli --help
+npx skilleton --help
 ```
 
 ## Usage
@@ -22,52 +26,52 @@ npx skillset-cli --help
 In your project, run:
 
 ```bash
-skillset add <owner/skill[@ref]>
+skilleton add <owner/skill[@ref]>
 ```
 
 For example:
 
 ```bash
-skillset add Mindrally/skills/chrome-extension-development@47f47c1
+skilleton add Mindrally/skills/chrome-extension-development@47f47c1
 
 # or
-skillset add Mindrally/skills/chrome-extension-development # defaults to latest commit on main
+skilleton add Mindrally/skills/chrome-extension-development # defaults to latest commit on main
 ```
 
-This will create a `skillset.json` file in your project root, update `skillset.lock.json`, and immediately install the requested skill (and the rest of the manifest) into `~/.skillset/skills`, using `~/.skillset/cache` for repo reuse.
+This will create a `skilleton.json` file in your project root, update `skilleton.lock.json`, and immediately install the requested skill (and the rest of the manifest) into `~/.skilleton/skills`, using `~/.skilleton/cache` for repo reuse.
 
 Think of it like running `npm install --save`: the manifest is updated and the dependency is fetched in one step.
 
 > [!IMPORTANT]
-> Make sure to commit your `skillset.json` and `skillset.lock.json` files to version control, and add `~/.skillset` to your `.gitignore` file.
+> Make sure to commit your `skilleton.json` and `skilleton.lock.json` files to version control, and add `~/.skilleton` to your `.gitignore` file.
 
 
 ### Installing Skills
 
-If you have a `skillset.json` file in your project (and you should :smirk:), you can install the skills by running:
+If you have a `skilleton.json` file in your project (and you should :smirk:), you can install the skills by running:
 
 ```bash
-skillset install
+skilleton install
 ```
 
 ### Listing Skills
 
 ```bash
-skillset list
+skilleton list
 ```
 
 ### Updating Skills
 
 ```bash
-skillset update
+skilleton update
 ```
 
 ## Features
 
-- Declarative `skillset.json` manifest that lives alongside your other project configs
-- Lockfile-driven installs (`skillset.lock.json`) for deterministic, versioned skills
+- Declarative `skilleton.json` manifest that lives alongside your other project configs
+- Lockfile-driven installs (`skilleton.lock.json`) for deterministic, versioned skills
 - Git-based resolution today (GitHub-first for now, but architecture keeps future sources open)
-- Cache-friendly git operations stored in `~/.skillset/cache`
+- Cache-friendly git operations stored in `~/.skilleton/cache`
 - Commands: `add`, `install`, `update`, `list`, `audit`
 
 ## Development
@@ -81,7 +85,7 @@ skillset update
 ```bash
 npm install
 npm run build
-node dist/bin/skillset.js --help
+node dist/bin/skilleton.js --help
 ```
 
 ## Repository Norms

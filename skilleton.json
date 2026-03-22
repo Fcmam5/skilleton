@@ -1,5 +1,5 @@
 {
-  "$schema": "./skillset.schema.json",
+  "$schema": "./skilleton.schema.json",
   "skills": [
     {
       "name": "typescript-magician",

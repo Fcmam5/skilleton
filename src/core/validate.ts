@@ -1,6 +1,6 @@
 import { Ajv, type ValidateFunction } from 'ajv';
 import formatsPlugin from 'ajv-formats';
-import schema from '../../skillset.schema.json';
+import schema from '../../skilleton.schema.json';
 import { SkillManifest } from './types';
 
 export class ManifestValidationError extends Error {

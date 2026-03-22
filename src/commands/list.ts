@@ -1,5 +1,5 @@
 import { Command, CommandArgs } from './types';
-import { SkillsetEnvironment } from '../env';
+import { SkilletonEnvironment } from '../env';
 import { LockedSkill, SkillDescriptor } from '../core/types';
 import { ManifestNotFoundError } from '../core/errors';
 
@@ -8,14 +8,14 @@ function shortSha(commit?: string): string {
 }
 
 export class ListCommand implements Command {
-  async run(env: SkillsetEnvironment, _args: CommandArgs): Promise<void> {
+  async run(env: SkilletonEnvironment, _args: CommandArgs): Promise<void> {
     try {
       const manifest = await env.manifestRepo.readManifest();
       env.validator.validate(manifest);
 
       const lockfile = await env.manifestRepo.readLockfileIfExists();
       if (manifest.skills.length === 0) {
-        console.log('No skills declared yet. Use "skillset add" to add one.');
+        console.log('No skills declared yet. Use "skilleton add" to add one.');
         return;
       }
 
@@ -23,7 +23,7 @@ export class ListCommand implements Command {
       this.printTable(manifest.skills, lockfile?.skills ?? {});
     } catch (error) {
       if (error instanceof ManifestNotFoundError) {
-        console.log('No skillset.json found. Run "skillset add" to create one.');
+        console.log('No skilleton.json found. Run "skilleton add" to create one.');
         return;
       }
       throw error;

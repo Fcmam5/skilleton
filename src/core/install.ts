@@ -4,7 +4,7 @@ import { getAgentSymlinkPath, getSkillsInstallPath, getSkillsRoot } from './conf
 import { SkillInstallError } from './errors';
 
 function resolveAgent(options: InstallOptions): string | null {
-  return options.agent ?? process.env.SKILLSET_AGENT ?? process.env.AGENT ?? null;
+  return options.agent ?? process.env.SKILLETON_AGENT ?? process.env.AGENT ?? null;
 }
 
 export class SkillInstaller {

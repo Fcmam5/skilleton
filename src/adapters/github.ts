@@ -6,7 +6,7 @@ const API_BASE = 'https://api.github.com';
 const USER_AGENT = `${packageJson.name}/${packageJson.version}`;
 
 export class RestGitHubClient implements GitHubClient {
-  constructor(private readonly token = process.env.SKILLSET_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN) {}
+  constructor(private readonly token = process.env.SKILLETON_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN) {}
 
   async resolveCommit(repo: string, ref: string): Promise<string> {
     const url = `${API_BASE}/repos/${repo}/commits/${encodeURIComponent(ref)}`;
