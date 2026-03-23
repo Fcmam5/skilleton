@@ -17,10 +17,14 @@ A living document outlining the near-term milestones for the Skilleton CLI.
 
 ## v0.2 "Safety Net"
 
-1. **`skilleton audit` command (scaffolding exists)**
+1. **`skilleton validate` command**
+   - Validate skill structure and required files
+   - Check for common security issues in SKILL.md
+   - Verify repository accessibility and permissions
+2. **`skilleton audit` command (scaffolding exists)**
    - Scan installed `SKILL.md` files for prompt-injection red flags (e.g., self-modifying instructions, network exfiltration hints).
    - Emit structured findings so CI can fail on high-risk issues.
-2. **Agent-aware linking**
+3. **Agent-aware linking**
    - Allow per-agent overrides in manifest (`preferredAgent`).
    - Offer `skilleton install --agent <name>` to switch symlink targets without reinstalling.
 
