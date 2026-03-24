@@ -8,7 +8,7 @@ function shortSha(commit?: string): string {
 }
 
 export class ListCommand implements Command {
-  async run(env: SkilletonEnvironment, _args: CommandArgs): Promise<void> {
+  async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     try {
       const manifest = await env.manifestRepo.readManifest();
       env.validator.validate(manifest);
@@ -19,8 +19,8 @@ export class ListCommand implements Command {
         return;
       }
 
-      console.log('Installed skills:\n');
-      this.printTable(manifest.skills, lockfile?.skills ?? {});
+      const format = this.parseFormatFlag(args);
+      this.printSkills(manifest.skills, lockfile?.skills ?? {}, format);
     } catch (error) {
       if (error instanceof ManifestNotFoundError) {
         console.log('No skilleton.json found. Run "skilleton add" to create one.');
@@ -30,15 +30,54 @@ export class ListCommand implements Command {
     }
   }
 
+  private parseFormatFlag(args: CommandArgs): string {
+    const format = args.flags.format;
+    if (typeof format === 'string') {
+      return format.toLowerCase();
+    }
+    return 'table';
+  }
+
+  private printSkills(skills: SkillDescriptor[], locked: Record<string, LockedSkill>, format: string): void {
+    switch (format) {
+      case 'json':
+        this.printJson(skills, locked);
+        break;
+      case 'table':
+      default:
+        this.printTable(skills, locked);
+        break;
+    }
+  }
+
+  private printJson(skills: SkillDescriptor[], locked: Record<string, LockedSkill>): void {
+    const jsonData = skills.map((skill) => {
+      const lock = locked[skill.name];
+      return {
+        name: skill.name,
+        repo: skill.repo,
+        path: skill.path,
+        ref: skill.ref,
+        commit: lock?.commit || null,
+      };
+    });
+    console.log(JSON.stringify(jsonData, null, 2));
+  }
+
   private printTable(skills: SkillDescriptor[], locked: Record<string, LockedSkill>): void {
-    const header = ['Name', 'Repo', 'Path', 'Ref', 'Commit'];
-    console.log(header.join(' | '));
-    console.log('-----|-----|-----|-----|-------');
+    const tableData: Record<string, string>[] = [];
 
     for (const skill of skills) {
       const lock = locked[skill.name];
-      const row = [skill.name, skill.repo, skill.path, skill.ref, shortSha(lock?.commit)];
-      console.log(row.join(' | '));
+      tableData.push({
+        Name: skill.name,
+        Repo: skill.repo,
+        Path: skill.path,
+        Ref: skill.ref,
+        Commit: shortSha(lock?.commit),
+      });
     }
+
+    console.table(tableData);
   }
 }

@@ -6,12 +6,10 @@ Manage AI skills like npm packages - with project manifests, lockfiles, and repr
 
 ## Why this exists
 
-`skills.sh` is great for installing skills globally, but teams need:
-
-- **Reproducible environments** - Everyone gets the same skill versions
-- **Project-scoped dependencies** - Skills live with your code, not globally  
-- **Version locking** - No surprises from upstream changes
-- **Team collaboration** - Commit manifests to version control
+- **Keep skills with code** – manifests + lockfiles are versioned right beside your source tree.
+- **Deterministic installs** – CI and every teammate pull the exact same commits.
+- **Zero shared state** – nothing lives in a global registry; installs happen from git.
+- **Privacy-first** – no telemetry, no cloud calls, easy to audit.
 
 ## Quickstart
 
@@ -59,29 +57,64 @@ skilleton install  # Installs exact pinned versions
 }
 ```
 
+And add the following to your `.gitignore`:
+
+```
+.skilleton/
+```
+
+
 ## Commands
 
 ```bash
 skilleton add <owner/skill[@ref]>    # Add skill and update manifest
 skilleton install                    # Install exact versions from lockfile  
 skilleton update                     # Refresh lockfile and reinstall
-skilleton list                       # Show installed skills
+skilleton list [--format=table|json] # Show installed skills
+skilleton validate                   # Check skill structure and security
 ```
 
-## vs skills.sh
+### List Command
 
-| Feature | Skilleton | skills.sh |
-|---------|-----------|-----------|
-| Team collaboration | ✅ Manifests + lockfiles | ❌ Global only |
-| Reproducible builds | ✅ Exact commit pinning | ❌ Latest by default |
-| Project isolation | ✅ Per-project skills | ❌ Shared global |
-| Version control | ✅ Git-friendly | ❌ Not designed for it |
+The `list` command shows all installed skills with their repository, path, ref, and commit information. It supports two output formats:
+
+**Table format (default):**
+```bash
+skilleton list
+# ┌─────────┬───────────────────────┬───────────────────────────────────────┬───────────┬───────────┐
+# │ (index) │ Name                  │ Repo                                  │ Path      │ Commit    │
+# ├─────────┼───────────────────────┼───────────────────────────────────────┼───────────┼───────────┤
+# │ 0       │ typescript-magician   │ https://github.com/mcollina/skills    │ skills/...│ 3e2ffbb   │
+# │ 1       │ jest                  │ https://github.com/Mindrally/skills   │ jest      │ 47f47c1   │
+# └─────────┴───────────────────────┴───────────────────────────────────────┴───────────┴───────────┘
+```
+
+**JSON format (for scripts/parsing):**
+```bash
+skilleton list --format=json
+# [
+#   {
+#     "name": "typescript-magician",
+#     "repo": "https://github.com/mcollina/skills",
+#     "path": "skills/typescript-magician",
+#     "ref": "3e2ffbb",
+#     "commit": "3e2ffbb90fda9e31d84011c765252b00bfc2d4d6"
+#   }
+# ]
+```
 
 ## Installation
 
 ```bash
 npm install -g skilleton
+
+# or run directly with npx
+npx skilleton add <owner/skill[@ref]>
 ```
+
+## Acknowledgments
+
+Special thanks to Brian and [Giuseppe](https://github.com/giuseppeminnella) for their valuable insights that inspired the creation of Skilleton.
 
 ## Privacy
 
