@@ -71,6 +71,7 @@ skilleton add <owner/skill[@ref]>    # Add skill and update manifest
 skilleton install                    # Install exact versions from lockfile  
 skilleton update                     # Refresh lockfile and reinstall
 skilleton list [--format=table|json] # Show installed skills
+skilleton describe <skill>           # Inspect metadata, install tree, SKILL.md header
 skilleton validate                   # Check skill structure and security
 ```
 
@@ -102,6 +103,34 @@ skilleton list --format=json
 #   }
 # ]
 ```
+
+### Describe Command
+
+Use `describe` when you need rich details about a specific skill:
+
+```bash
+skilleton describe typescript-magician
+# Name: typescript-magician
+# Repo: https://github.com/mcollina/skills
+# Path: skills/typescript-magician
+# Ref: main
+# Commit: 3e2ffbb90fda9e31d84011c765252b00bfc2d4d6
+# Install path: .skilleton/skills/typescript-magician
+#
+# Folder structure:
+#   README.md
+#   SKILL.md
+#   rules/
+#   rules/rule.md
+#
+# SKILL.md header:
+# ---
+# name: typescript-magician
+# description: ...
+# ---
+```
+
+It falls back gracefully if the skill is missing from the manifest, not yet installed, or lacks a SKILL.md file.
 
 ## Installation
 

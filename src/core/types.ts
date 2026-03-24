@@ -46,6 +46,8 @@ export interface FileSystem {
   ensureDir(path: string): Promise<void>;
   readJson<T>(path: string): Promise<T>;
   writeJson(path: string, data: unknown): Promise<void>;
+  readFile(path: string): Promise<string>;
+  isDirectory(path: string): Promise<boolean>;
   remove(path: string): Promise<void>;
   copy(src: string, dest: string): Promise<void>;
   symlink(target: string, path: string): Promise<void>;

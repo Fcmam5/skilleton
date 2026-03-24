@@ -27,6 +27,19 @@ export class NodeFileSystem implements FileSystem {
     await fs.writeFile(target, `${serialized}\n`, 'utf-8');
   }
 
+  async readFile(target: string): Promise<string> {
+    return fs.readFile(target, 'utf-8');
+  }
+
+  async isDirectory(target: string): Promise<boolean> {
+    try {
+      const stats = await fs.stat(target);
+      return stats.isDirectory();
+    } catch {
+      return false;
+    }
+  }
+
   async remove(target: string): Promise<void> {
     await fs.rm(target, { recursive: true, force: true });
   }

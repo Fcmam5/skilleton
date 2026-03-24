@@ -18,7 +18,7 @@ flowchart TD
 ## Layering
 
 1. **CLI (bin/skilleton.ts)**: Parses process arguments, delegates to command handlers, and formats output.
-2. **Application Services (src/commands)**: One per command (`add`, `install`, `update`, `list`, `audit`). Services orchestrate use cases, operate on repositories, and return rich result objects.
+2. **Application Services (src/commands)**: One per command (`add`, `install`, `update`, `list`, `describe`, `audit`). Services orchestrate use cases, operate on repositories, and return rich result objects. `describe` combines manifest/lock metadata with filesystem inspection and SKILL.md parsing.
 3. **Domain Core (src/core)**:
    - `parse.ts`: Input normalization from `<owner>/<skill>[@ref]` or any repo URL into structured `SkillDescriptor` objects.
    - `repos.ts`: Repository helpers that normalize/validate URLs, derive cache keys, and enforce deterministic manifests.

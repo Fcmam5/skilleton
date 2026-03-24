@@ -5,6 +5,7 @@ import { AddCommand } from '../src/commands/add';
 import { InstallCommand } from '../src/commands/install';
 import { UpdateCommand } from '../src/commands/update';
 import { ListCommand } from '../src/commands/list';
+import { DescribeCommand } from '../src/commands/describe';
 import { AuditCommand } from '../src/commands/audit';
 import { createEnvironment } from '../src/env';
 
@@ -15,6 +16,7 @@ const commands: CommandRegistry = {
   install: new InstallCommand(),
   update: new UpdateCommand(),
   list: new ListCommand(),
+  describe: new DescribeCommand(),
   audit: new AuditCommand(),
 };
 
@@ -53,7 +55,7 @@ function parseArgs(argv: string[]): { command: string | null; args: CommandArgs 
 
 function printHelp(): void {
   console.log(
-    `Skilleton — Skills Skeleton\n\nUsage:\n  skilleton <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skilleton.json\n  install [--agent <name>]    Install skills defined in skilleton.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list                        Show declared skills and pinned commits\n  audit                       Placeholder for future audit functionality\n\nRun "skilleton <command> --help" for details.\n`,
+    `Skilleton — Skills Skeleton\n\nUsage:\n  skilleton <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skilleton.json\n  install [--agent <name>]    Install skills defined in skilleton.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list                        Show declared skills and pinned commits\n  describe <skill-name>       Inspect a skill's metadata and installed contents\n  audit                       Placeholder for future audit functionality\n\nRun "skilleton <command> --help" for details.\n`,
   );
 }
 
