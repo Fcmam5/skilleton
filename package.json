@@ -1,6 +1,6 @@
 {
   "name": "skilleton",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Skills skeleton: deterministic AI skill dependency manager",
   "type": "commonjs",
   "private": false,
