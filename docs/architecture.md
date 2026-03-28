@@ -23,11 +23,11 @@ flowchart TD
    - `parse.ts`: Input normalization from `<owner>/<skill>[@ref]` or any repo URL into structured `SkillDescriptor` objects.
    - `repos.ts`: Repository helpers that normalize/validate URLs, derive cache keys, and enforce deterministic manifests.
    - `validate.ts`: JSON Schema validation using AJV, enforcing manifest invariants.
-   - `resolve.ts`: Commit resolution, SHA lookups (GitHub today, other VCS hosts later), SKILL.md guarantees.
+   - `git-ref-resolver.ts`: Resolves refs (branches/tags/SHAs) to commit SHAs via `git ls-remote`.
+   - `resolve.ts`: Commit resolution orchestration using GitRefResolver.
    - `install.ts`: Filesystem + git orchestration, cache management, extraction, and idempotent installs.
 4. **Adapters (src/adapters)**:
-   - `github.ts`: REST wrapper using `fetch` with token/env injection.
-   - `git.ts`: `execa`-based git commands (clone, fetch, checkout).
+   - `git.ts`: `execa`-based git commands (clone, fetch, checkout, ls-remote).
    - `fs.ts`: Filesystem helpers (ensureDir, writeJson, readJson, symlinks).
 5. **Infrastructure**: Shared utilities, config resolution, logging, and error types.
 
@@ -39,7 +39,7 @@ sequenceDiagram
   participant CLI as CLI Entrypoint
   participant Cmd as Command Handler
   participant Core as Core Services
-  participant Adapt as Git/GitHub Adapters
+  participant Adapt as Git Adapter
   participant FS as FS/Lockfile
 
   User->>CLI: skilleton add owner/skill@ref
@@ -52,11 +52,12 @@ sequenceDiagram
   User->>CLI: skilleton install
   CLI->>Cmd: dispatch install
   Cmd->>FS: load manifest & lockfile
-  Cmd->>Core: resolve commits
-  Core->>Adapt: resolveCommit / ensureRepo
-  Adapt-->>Core: commit SHA / repo path
-  Core->>FS: write lockfile & copy skills
-  Cmd->>User: install summary
+  Cmd->>Core: resolve refs via GitRefResolver
+  Core->>Adapt: git ls-remote
+  Adapt-->>Core: commit SHA
+  Cmd->>Adapt: git clone/fetch/checkout
+  Adapt->>FS: export skill files
+  Cmd->>User: "Installed skill..."
 ```
 
 This diagram highlights that manifest writes always pass through `normalizeDescriptor`, ensuring every repo field is stored as a normalized URL (e.g., `https://github.com/owner/skills`), regardless of whether the user provided a slug or full URL.

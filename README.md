@@ -25,6 +25,8 @@ git pull  # Gets skilleton.json + skilleton.lock.json
 skilleton install  # Installs exact pinned versions
 ```
 
+> **Note**: Skilleton resolves skill refs via `git ls-remote` and requires a local git installation. It respects your local git credentials for private repositories.
+
 ## How it works
 
 **skilleton.json** (commit this):

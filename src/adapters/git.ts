@@ -4,6 +4,7 @@ import path from 'node:path';
 import { execa } from 'execa';
 import { GitClient } from '../core/types';
 import { getCacheRoot, getRepoCachePath } from '../core/config';
+import { ensureRepoUrl } from '../core/repos';
 import { SkillInstallError } from '../core/errors';
 
 async function pathExists(target: string): Promise<boolean> {
@@ -20,9 +21,11 @@ export class ExecaGitClient implements GitClient {
 
   async ensureRepo(repo: string, destination?: string): Promise<string> {
     const repoCachePath = destination ?? getRepoCachePath(repo);
+    const repoUrl = ensureRepoUrl(repo);
+    const cloneSource = `${repoUrl}.git`.replace(/\.git\.git$/i, '.git');
     if (!(await pathExists(repoCachePath))) {
       await fs.mkdir(path.dirname(repoCachePath), { recursive: true });
-      await execa('git', ['clone', '--filter=blob:none', `https://github.com/${repo}.git`, repoCachePath]);
+      await execa('git', ['clone', '--filter=blob:none', cloneSource, repoCachePath]);
     } else {
       await execa('git', ['-C', repoCachePath, 'fetch', '--tags', '--prune', '--force']);
     }

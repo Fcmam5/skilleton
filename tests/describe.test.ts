@@ -143,13 +143,12 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
   };
 
   return {
-    fs,
-    validator: null as never,
-    manifestRepo: manifestRepo as never,
-    github: null as never,
-    git: null as never,
-    resolver: null as never,
-    installer: null as never,
+    fs: fs as any,
+    validator: null as any,
+    manifestRepo: manifestRepo as any,
+    git: null as any,
+    resolver: null as any,
+    installer: null as any,
   };
 }
 
