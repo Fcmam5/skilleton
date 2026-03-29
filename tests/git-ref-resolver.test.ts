@@ -92,7 +92,7 @@ describe('GitRefResolver', () => {
       expect(result).toBe('47f47c12e62f62b5e171bd5af61d0fc24b329701');
     });
 
-    it('handles SSH URLs without modification', async () => {
+    it('converts SSH shorthand to HTTPS URLs', async () => {
       mockExeca.mockResolvedValue({
         stdout: 'feedfacecafebabedeadbeefcafebabedeadbeef\trefs/heads/main\n',
       } as any);
@@ -100,7 +100,7 @@ describe('GitRefResolver', () => {
       expect(mockExeca).toHaveBeenCalledWith('git', [
         'ls-remote',
         '--refs',
-        'https://github.com/git@github.com:owner/repo.git',
+        'https://github.com/owner/repo.git',
         'main',
         'refs/heads/main',
         'refs/tags/main',

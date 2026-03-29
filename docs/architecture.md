@@ -27,7 +27,7 @@ flowchart TD
    - `resolve.ts`: Commit resolution orchestration using GitRefResolver.
    - `install.ts`: Filesystem + git orchestration, cache management, extraction, and idempotent installs.
 4. **Adapters (src/adapters)**:
-   - `git.ts`: `execa`-based git commands (clone, fetch, checkout, ls-remote).
+   - `git.ts`: `execa`-based git commands (clone, fetch, worktree attach/export flow, ls-remote).
    - `fs.ts`: Filesystem helpers (ensureDir, writeJson, readJson, symlinks).
 5. **Infrastructure**: Shared utilities, config resolution, logging, and error types.
 
@@ -55,7 +55,7 @@ sequenceDiagram
   Cmd->>Core: resolve refs via GitRefResolver
   Core->>Adapt: git ls-remote
   Adapt-->>Core: commit SHA
-  Cmd->>Adapt: git clone/fetch/checkout
+  Cmd->>Adapt: git clone/fetch/worktree attach/export flow
   Adapt->>FS: export skill files
   Cmd->>User: "Installed skill..."
 ```

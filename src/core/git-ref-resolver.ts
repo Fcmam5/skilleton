@@ -49,6 +49,7 @@ export class GitRefResolver {
 
   private normalizeRepo(repo: string): string {
     const normalized = ensureRepoUrl(repo);
+    // Only append .git for HTTPS URLs, not SSH-style repos
     if (normalized.startsWith('https://')) {
       return `${normalized}.git`.replace(/\.git\.git$/i, '.git');
     }
