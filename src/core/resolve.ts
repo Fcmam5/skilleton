@@ -1,5 +1,6 @@
-import { LockedSkill, SkillDescriptor, SkillLockfile, GitHubClient } from './types';
+import { LockedSkill, SkillDescriptor, SkillLockfile } from './types';
 import { SkillValidationError } from './errors';
+import { GitRefResolver } from './git-ref-resolver';
 
 export interface ResolveOptions {
   lockfile?: SkillLockfile | null;
@@ -7,7 +8,7 @@ export interface ResolveOptions {
 }
 
 export class SkillResolver {
-  constructor(private readonly github: GitHubClient) {}
+  constructor(private readonly refResolver: GitRefResolver) {}
 
   async resolve(descriptors: SkillDescriptor[], options: ResolveOptions = {}): Promise<LockedSkill[]> {
     if (!descriptors.length) {
@@ -28,7 +29,7 @@ export class SkillResolver {
         throw new SkillValidationError(`Skill ${descriptor.name} missing from lockfile. Run "skilleton update".`);
       }
 
-      const commit = await this.github.resolveCommit(descriptor.repo, descriptor.ref);
+      const commit = await this.refResolver.resolve(descriptor.repo, descriptor.ref);
       resolved.push({
         ...descriptor,
         commit,

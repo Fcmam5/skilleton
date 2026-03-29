@@ -53,7 +53,3 @@ export interface FileSystem {
   symlink(target: string, path: string): Promise<void>;
   readDir(path: string): Promise<string[]>;
 }
-
-export interface GitHubClient {
-  resolveCommit(repo: string, ref: string, token?: string): Promise<string>;
-}

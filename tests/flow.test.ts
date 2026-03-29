@@ -79,13 +79,12 @@ describe('end-to-end command flow', () => {
     const validator = new ManifestValidator();
 
     const env: SkilletonEnvironment = {
-      fs: null as never,
-      validator,
-      manifestRepo: manifestRepo as never,
-      github: null as never,
-      git: null as never,
-      resolver: resolver as never,
-      installer: installer as never,
+      fs: null as any,
+      validator: validator as any,
+      manifestRepo: manifestRepo as any,
+      git: null as any,
+      resolver: resolver as any,
+      installer: installer as any,
     };
 
     const command = new AddCommand();

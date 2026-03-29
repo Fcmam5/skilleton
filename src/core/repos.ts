@@ -8,6 +8,11 @@ export function isRepoUrl(spec: string): boolean {
     return false;
   }
 
+  // Check for SSH-style git@host:owner/repo pattern
+  if (/^git@[\w.-]+:[\w./-]+(?:\.git)?$/.test(spec)) {
+    return true;
+  }
+
   try {
     const parsed = new URL(spec);
     return SUPPORTED_PROTOCOLS.has(parsed.protocol.toLowerCase());
@@ -24,6 +29,13 @@ export function normalizeRepoUrl(url: string): string {
 export function ensureRepoUrl(spec: string): string {
   if (!spec || typeof spec !== 'string') {
     throw new Error('Repository must be a non-empty string');
+  }
+
+  // Handle SSH-style git@host:owner/repo pattern - convert to HTTPS
+  const sshMatch = spec.match(/^git@([\w.-]+):([\w./-]+)(?:\.git)?$/);
+  if (sshMatch) {
+    const [, host, path] = sshMatch;
+    return normalizeRepoUrl(`https://${host}/${path}`);
   }
 
   if (isRepoUrl(spec)) {
