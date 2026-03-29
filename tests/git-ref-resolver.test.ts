@@ -85,12 +85,15 @@ describe('GitRefResolver', () => {
 
       const result = await resolver.resolve('owner/repo', 'deadbeef');
       expect(result).toBe('deadbeef123456789012345678901234567890abcd');
-      expect(mockRunner).toHaveBeenNthCalledWith(1, 'git', ['ls-remote', 'https://github.com/owner/repo.git']);
-      expect(mockRunner).toHaveBeenNthCalledWith(2, 'git', [
+      expect(mockRunner).toHaveBeenNthCalledWith(1, 'git', [
         'ls-remote',
         '--refs',
         'https://github.com/owner/repo.git',
+        'deadbeef',
+        'refs/heads/deadbeef',
+        'refs/tags/deadbeef',
       ]);
+      expect(mockRunner).toHaveBeenNthCalledWith(2, 'git', ['ls-remote', 'https://github.com/owner/repo.git']);
     });
 
     it('converts SSH shorthand to HTTPS URLs', async () => {

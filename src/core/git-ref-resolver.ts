@@ -4,7 +4,7 @@ import { SkillValidationError } from './errors';
 const SHA_PATTERN = /^[0-9a-f]{40}$/i;
 const SHORT_SHA_PATTERN = /^[0-9a-f]{6,}$/i;
 
-type ExecaRunner = (cmd: string, args: string[]) => Promise<{ stdout: string }>;
+type ExecaRunner = (_cmd: string, _args: string[]) => Promise<{ stdout: string }>;
 
 async function defaultRunner(_cmd: string, _args: string[]): Promise<{ stdout: string }> {
   const { execa } = await import('execa');
@@ -26,22 +26,16 @@ export class GitRefResolver {
     const isShortSha = SHORT_SHA_PATTERN.test(ref);
 
     try {
-      const args = isShortSha ? ['ls-remote', remote] : ['ls-remote', '--refs', remote, ...this.buildRefPatterns(ref)];
-      const { stdout } = await this._run(this._gitBinary, args);
+      const refPatterns = this.buildRefPatterns(ref);
+      const { stdout: refsStdout } = await this._run(this._gitBinary, ['ls-remote', '--refs', remote, ...refPatterns]);
+      const exactSha = this.extractSha(refsStdout, refPatterns);
+      if (exactSha) {
+        return exactSha;
+      }
 
       if (isShortSha) {
-        const sha = this.extractShaByPrefix(stdout, ref);
-        if (sha) {
-          return sha;
-        }
-        // Fallback: try with --refs to include branch/tag names that might contain the prefix
-        const { stdout: refsStdout } = await this._run(this._gitBinary, ['ls-remote', '--refs', remote]);
-        const refsSha = this.extractShaByPrefix(refsStdout, ref);
-        if (refsSha) {
-          return refsSha;
-        }
-      } else {
-        const sha = this.extractSha(stdout, this.buildRefPatterns(ref));
+        const { stdout: prefixStdout } = await this._run(this._gitBinary, ['ls-remote', remote]);
+        const sha = this.extractShaByPrefix(prefixStdout, ref);
         if (sha) {
           return sha;
         }
@@ -82,7 +76,7 @@ export class GitRefResolver {
       if (!sha || !name) {
         continue;
       }
-      if (patterns.some((pattern) => name === pattern || name.endsWith(pattern))) {
+      if (patterns.some((pattern) => name === pattern)) {
         return sha;
       }
     }
@@ -94,12 +88,23 @@ export class GitRefResolver {
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
+
+    const matches: string[] = [];
     for (const line of lines) {
       const [sha] = line.split(/\s+/);
       if (sha && sha.startsWith(prefix)) {
-        return sha;
+        matches.push(sha);
       }
     }
-    return null;
+
+    if (matches.length === 0) {
+      return null;
+    }
+
+    if (matches.length === 1) {
+      return matches[0];
+    }
+
+    throw new SkillValidationError(`Ref prefix "${prefix}" is ambiguous. Matches: ${matches.join(', ')}`);
   }
 }

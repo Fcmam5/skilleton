@@ -108,7 +108,11 @@ describe('SkillInstaller', () => {
         path.join('/workspace/.skilleton/agents', 'env-bot', skill.name),
       );
     } finally {
-      process.env.SKILLETON_AGENT = original;
+      if (original === undefined) {
+        delete process.env.SKILLETON_AGENT;
+      } else {
+        process.env.SKILLETON_AGENT = original;
+      }
     }
   });
 
