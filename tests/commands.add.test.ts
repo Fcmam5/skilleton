@@ -16,11 +16,17 @@ jest.mock('../src/commands/install', () => ({
   })),
 }));
 
+let consoleSpy: jest.SpyInstance;
+
 describe('AddCommand', () => {
   const usageMessage = 'Usage: skilleton add <owner/skill[@ref]>';
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    consoleSpy?.mockRestore();
   });
 
   it('throws when no skill input is provided', async () => {
@@ -55,7 +61,7 @@ describe('AddCommand', () => {
 
     const { env, manifestRepo, validator } = createEnv(manifest);
     const command = new AddCommand();
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
     await command.run(env, { positional: ['owner/jest'], flags: {} });
 
@@ -66,22 +72,18 @@ describe('AddCommand', () => {
     };
     expect(validator.validate).toHaveBeenCalledWith(expectedManifest);
     expect(manifestRepo.writeManifest).toHaveBeenCalledWith(expectedManifest);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Added skill jest (https://github.com/mindrally/skills/jest@main)',
-    );
+    expect(consoleSpy).toHaveBeenCalledWith('Added skill jest (https://github.com/mindrally/skills/jest@main)');
     expect(consoleSpy).toHaveBeenCalledWith('Installing skills...');
     expect(InstallCommand).toHaveBeenCalledTimes(1);
     expect(mockInstallRun).toHaveBeenCalledWith(env, { positional: ['owner/jest'], flags: {} });
-
-    consoleSpy.mockRestore();
   });
 });
 
 function createEnv(manifest?: SkillManifest) {
   const manifestRepo = {
-    readOrInitializeManifest: jest.fn().mockResolvedValue(
-      manifest ?? ({ $schema: './skilleton.schema.json', skills: [] } as SkillManifest),
-    ),
+    readOrInitializeManifest: jest
+      .fn()
+      .mockResolvedValue(manifest ?? ({ $schema: './skilleton.schema.json', skills: [] } as SkillManifest)),
     writeManifest: jest.fn().mockResolvedValue(undefined),
   };
 

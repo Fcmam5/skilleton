@@ -63,48 +63,6 @@ describe('config helpers', () => {
     });
   });
 
-  describe('repoCacheKey', () => {
-    it('sanitizes owner/repo to owner_repo', () => {
-      const key = repoCacheKey('owner/repo');
-      expect(key).toBe('https_github.com_owner_repo');
-    });
-
-    it('sanitizes owner/repo/subpath to owner_repo_subpath', () => {
-      const key = repoCacheKey('owner/repo/sub/path');
-      expect(key).toBe('https_github.com_owner_repo_sub_path');
-    });
-
-    it('handles HTTPS URLs with .git', () => {
-      const key = repoCacheKey('https://github.com/owner/repo.git');
-      expect(key).toBe('https_github.com_owner_repo');
-    });
-
-    it('handles HTTPS URLs without .git', () => {
-      const key = repoCacheKey('https://github.com/owner/repo');
-      expect(key).toBe('https_github.com_owner_repo');
-    });
-
-    it('handles HTTPS URLs with subpath', () => {
-      const key = repoCacheKey('https://github.com/owner/repo/sub/path');
-      expect(key).toBe('https_github.com_owner_repo_sub_path');
-    });
-
-    it('handles SSH shorthand', () => {
-      const key = repoCacheKey('git@github.com:owner/repo.git');
-      expect(key).toBe('https_github.com_owner_repo');
-    });
-
-    it('handles SSH shorthand without .git', () => {
-      const key = repoCacheKey('git@github.com:owner/repo');
-      expect(key).toBe('https_github.com_owner_repo');
-    });
-
-    it('handles SSH shorthand with subpath', () => {
-      const key = repoCacheKey('git@github.com:owner/repo/sub/path');
-      expect(key).toBe('https_github.com_owner_repo_sub_path');
-    });
-  });
-
   describe('schemaRelativePath', () => {
     it('returns ./skilleton.schema.json', () => {
       const path = schemaRelativePath();

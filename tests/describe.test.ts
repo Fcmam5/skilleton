@@ -213,12 +213,35 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
 
   return {
     fs: fs as any,
-    validator: null as any,
+    validator: createThrowingProxy('validator') as any,
     manifestRepo: manifestRepo as any,
-    git: null as any,
-    resolver: null as any,
-    installer: null as any,
+    git: createThrowingProxy('git') as any,
+    resolver: createThrowingProxy('resolver') as any,
+    installer: createThrowingProxy('installer') as any,
   };
+}
+
+function createThrowingProxy(name: string): ProxyHandler<object> {
+  return new Proxy(
+    {},
+    {
+      get() {
+        throw new Error(`Unexpected access to stubbed dependency: ${name}`);
+      },
+      set() {
+        throw new Error(`Unexpected mutation of stubbed dependency: ${name}`);
+      },
+      has() {
+        return true;
+      },
+      ownKeys() {
+        return [];
+      },
+      getOwnPropertyDescriptor() {
+        return { enumerable: true, configurable: true };
+      },
+    },
+  );
 }
 
 class InMemoryFileSystem implements FileSystem {

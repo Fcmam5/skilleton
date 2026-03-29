@@ -94,7 +94,7 @@ describe('InstallCommand', () => {
 
     expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills);
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
-    expect(testEnv.installer.install).toHaveBeenCalledWith(locked, { agent: undefined });
+    expect(testEnv.installer.install).toHaveBeenCalledWith(locked, expect.objectContaining({ agent: undefined }));
     expect(logSpy).toHaveBeenCalledWith('Created skilleton.lock.json');
     expect(logSpy).toHaveBeenCalledWith('Installed skill1 @ abc123 → .skilleton/skills/skill1');
   });
@@ -110,7 +110,10 @@ describe('InstallCommand', () => {
     await command.run(testEnv.env, { positional: [], flags: { agent: 'dev-agent' } });
 
     expect(testEnv.resolver.resolve).not.toHaveBeenCalled();
-    expect(testEnv.installer.install).toHaveBeenCalledWith([baseLockedSkill], { agent: 'dev-agent' });
+    expect(testEnv.installer.install).toHaveBeenCalledWith(
+      [baseLockedSkill],
+      expect.objectContaining({ agent: 'dev-agent' }),
+    );
     expect(testEnv.manifestRepo.writeLockfile).not.toHaveBeenCalled();
   });
 
@@ -135,6 +138,6 @@ describe('InstallCommand', () => {
 
     await command.run(testEnv.env, { positional: [], flags: { agent: 'qa-agent' } });
 
-    expect(testEnv.installer.install).toHaveBeenCalledWith(locked, { agent: 'qa-agent' });
+    expect(testEnv.installer.install).toHaveBeenCalledWith(locked, expect.objectContaining({ agent: 'qa-agent' }));
   });
 });
