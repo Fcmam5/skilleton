@@ -1,12 +1,21 @@
-import { execa } from 'execa';
 import { ensureRepoUrl } from './repos';
 import { SkillValidationError } from './errors';
 
 const SHA_PATTERN = /^[0-9a-f]{40}$/i;
 const SHORT_SHA_PATTERN = /^[0-9a-f]{6,}$/i;
 
+type ExecaRunner = (cmd: string, args: string[]) => Promise<{ stdout: string }>;
+
+async function defaultRunner(_cmd: string, _args: string[]): Promise<{ stdout: string }> {
+  const { execa } = await import('execa');
+  return execa(_cmd, _args);
+}
+
 export class GitRefResolver {
-  constructor(private readonly _gitBinary: string = 'git') {}
+  constructor(
+    private readonly _gitBinary: string = 'git',
+    private readonly _run: ExecaRunner = defaultRunner,
+  ) {}
 
   async resolve(repo: string, ref: string): Promise<string> {
     if (SHA_PATTERN.test(ref)) {
@@ -18,7 +27,7 @@ export class GitRefResolver {
 
     try {
       const args = isShortSha ? ['ls-remote', remote] : ['ls-remote', '--refs', remote, ...this.buildRefPatterns(ref)];
-      const { stdout } = await execa(this._gitBinary, args);
+      const { stdout } = await this._run(this._gitBinary, args);
 
       if (isShortSha) {
         const sha = this.extractShaByPrefix(stdout, ref);
@@ -26,7 +35,7 @@ export class GitRefResolver {
           return sha;
         }
         // Fallback: try with --refs to include branch/tag names that might contain the prefix
-        const { stdout: refsStdout } = await execa(this._gitBinary, ['ls-remote', '--refs', remote]);
+        const { stdout: refsStdout } = await this._run(this._gitBinary, ['ls-remote', '--refs', remote]);
         const refsSha = this.extractShaByPrefix(refsStdout, ref);
         if (refsSha) {
           return refsSha;

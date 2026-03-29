@@ -2,6 +2,7 @@ import path from 'node:path';
 import { DescribeCommand } from '../src/commands/describe';
 import { SkilletonEnvironment } from '../src/env';
 import { FileSystem, SkillLockfile, SkillManifest } from '../src/core/types';
+import { ManifestNotFoundError } from '../src/core/errors';
 
 describe('DescribeCommand', () => {
   let consoleLogSpy: jest.SpyInstance;
@@ -114,6 +115,69 @@ describe('DescribeCommand', () => {
     expect(logs).toContain('---');
     expect(logs).toContain('name: typescript-magician');
   });
+
+  it('prints message when SKILL is installed but no SKILL.md exists', async () => {
+    const skillName = 'no-skill-file';
+    const installPath = `/repo/.skilleton/skills/${skillName}`;
+    const manifest: SkillManifest = {
+      $schema: './skilleton.schema.json',
+      skills: [
+        {
+          name: skillName,
+          repo: 'https://github.com/example/skills',
+          path: 'skills/no-skill-file',
+          ref: 'main',
+        },
+      ],
+    };
+
+    const fs = new InMemoryFileSystem();
+    fs.addDirectory(installPath);
+    fs.addFile(path.join(installPath, 'README.md'), '# Readme');
+    const env = createEnv({ manifest, installPaths: { [skillName]: installPath }, fileSystem: fs });
+
+    const command = new DescribeCommand();
+    await command.run(env, { positional: [skillName], flags: {} });
+
+    const logs = consoleLogSpy.mock.calls.map(([message]) => message);
+    expect(logs).toContain('No SKILL.md found.');
+  });
+
+  it('prints message when SKILL.md lacks frontmatter', async () => {
+    const skillName = 'missing-frontmatter';
+    const installPath = `/repo/.skilleton/skills/${skillName}`;
+    const manifest: SkillManifest = {
+      $schema: './skilleton.schema.json',
+      skills: [
+        {
+          name: skillName,
+          repo: 'https://github.com/example/skills',
+          path: 'skills/missing-frontmatter',
+          ref: 'main',
+        },
+      ],
+    };
+
+    const fs = new InMemoryFileSystem();
+    fs.addDirectory(installPath);
+    fs.addFile(path.join(installPath, 'SKILL.md'), '# Hello world');
+    const env = createEnv({ manifest, installPaths: { [skillName]: installPath }, fileSystem: fs });
+
+    const command = new DescribeCommand();
+    await command.run(env, { positional: [skillName], flags: {} });
+
+    const logs = consoleLogSpy.mock.calls.map(([message]) => message);
+    expect(logs).toContain('SKILL.md does not contain frontmatter.');
+  });
+
+  it('warns when manifest is missing entirely', async () => {
+    const env = createEnv({ manifestError: new ManifestNotFoundError('missing') });
+    const command = new DescribeCommand();
+
+    await command.run(env, { positional: ['jest'], flags: {} });
+
+    expect(consoleLogSpy).toHaveBeenCalledWith('No skilleton.json found. Run "skilleton add" to create one.');
+  });
 });
 
 interface CreateEnvOptions {
@@ -121,6 +185,7 @@ interface CreateEnvOptions {
   lockfile?: SkillLockfile | null;
   installPaths?: Record<string, string>;
   fileSystem?: FileSystem;
+  manifestError?: Error | null;
 }
 
 function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
@@ -129,9 +194,13 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
   const lockfile = options.lockfile ?? null;
   const installPaths = options.installPaths ?? {};
   const fs = options.fileSystem ?? new InMemoryFileSystem();
+  const manifestError = options.manifestError ?? null;
 
   const manifestRepo = {
     async readManifest() {
+      if (manifestError) {
+        throw manifestError;
+      }
       return manifest;
     },
     async readLockfileIfExists() {
