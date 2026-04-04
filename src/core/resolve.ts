@@ -8,7 +8,7 @@ export interface ResolveOptions {
 }
 
 export class SkillResolver {
-  constructor(private readonly refResolver: GitRefResolver) {}
+  constructor(private readonly _refResolver: GitRefResolver) {}
 
   async resolve(descriptors: SkillDescriptor[], options: ResolveOptions = {}): Promise<LockedSkill[]> {
     if (!descriptors.length) {
@@ -29,7 +29,7 @@ export class SkillResolver {
         throw new SkillValidationError(`Skill ${descriptor.name} missing from lockfile. Run "skilleton update".`);
       }
 
-      const commit = await this.refResolver.resolve(descriptor.repo, descriptor.ref);
+      const commit = await this._refResolver.resolve(descriptor.repo, descriptor.ref);
       resolved.push({
         ...descriptor,
         commit,

@@ -52,10 +52,10 @@ function deriveRepoAndPathFromUrl(spec: string): { repo: string; path: string } 
 
 function deriveFromSegments(segments: string[]): { repo: string; path: string } {
   if (segments.length === 2) {
-    const [owner, skill] = segments;
+    const [owner, repo] = segments;
     return {
-      repo: normalizeRepoUrl(`${DEFAULT_REPO_HOST}/${owner}/skills`),
-      path: skill,
+      repo: normalizeRepoUrl(`${DEFAULT_REPO_HOST}/${owner}/${repo}`),
+      path: '.',
     };
   }
 
@@ -88,7 +88,7 @@ export function parseSkillInput(input: string): SkillDescriptor {
   const { spec, ref } = splitRef(trimmed);
   const { repo, path } = isRepoUrl(spec) ? deriveRepoAndPathFromUrl(spec) : deriveFromSegments(normalizeSegments(spec));
   const normalizedPath = path === '.' ? path : path.replace(/\\/g, '/');
-  const pathSegments = normalizedPath.split('/').filter(Boolean);
+  const pathSegments = normalizedPath === '.' ? [] : normalizedPath.split('/').filter(Boolean);
   const name = pathSegments[pathSegments.length - 1] || repo.split('/').filter(Boolean).pop() || spec;
 
   return {
