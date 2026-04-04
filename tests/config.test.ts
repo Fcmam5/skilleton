@@ -1,5 +1,6 @@
 import { homedir } from 'os';
 import { join } from 'path';
+import packageJson from '../package.json';
 import {
   getManifestPath,
   getLockfilePath,
@@ -63,10 +64,12 @@ describe('config helpers', () => {
     });
   });
 
-  describe('schemaRelativePath', () => {
-    it('returns ./skilleton.schema.json', () => {
+  describe('schema path', () => {
+    it('returns the versioned remote schema URL', () => {
       const path = schemaRelativePath();
-      expect(path).toBe('./skilleton.schema.json');
+      expect(path).toBe(
+        `https://raw.githubusercontent.com/Fcmam5/skilleton/v${packageJson.version}/skilleton.schema.json`,
+      );
     });
   });
 });
