@@ -5,16 +5,16 @@
       "repo": "https://github.com/mcollina/skills",
       "path": "skills/typescript-magician",
       "ref": "main",
-      "commit": "317db7c0a9bf71a8d3a4c23ad599895f86d60503",
-      "timestamp": "2026-03-28T23:55:14.012Z"
+      "commit": "3a5bd304cf5cdf75a997b03bb675121f4bbb365b",
+      "timestamp": "2026-04-04T21:52:16.885Z"
     },
     "jest": {
       "name": "jest",
       "repo": "https://github.com/Mindrally/skills",
       "path": "jest",
-      "ref": "47f47c1",
+      "ref": "47f47c12e62f62b5e171bd5af61d0fc24b329701",
       "commit": "47f47c12e62f62b5e171bd5af61d0fc24b329701",
-      "timestamp": "2026-03-28T23:55:14.527Z"
+      "timestamp": "2026-04-04T21:52:16.885Z"
     }
   }
 }
