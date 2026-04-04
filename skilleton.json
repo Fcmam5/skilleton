@@ -3,13 +3,13 @@
   "skills": [
     {
       "name": "typescript-magician",
-      "repo": "mcollina/skills",
+      "repo": "https://github.com/mcollina/skills",
       "path": "skills/typescript-magician",
       "ref": "main"
     },
     {
       "name": "jest",
-      "repo": "Mindrally/skills",
+      "repo": "https://github.com/Mindrally/skills",
       "path": "jest",
       "ref": "47f47c12e62f62b5e171bd5af61d0fc24b329701"
     }

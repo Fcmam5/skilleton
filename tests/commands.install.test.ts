@@ -3,7 +3,6 @@ import { ManifestRepository } from '../src/core/manifest';
 import { ManifestValidator } from '../src/core/validate';
 import { SkillResolver } from '../src/core/resolve';
 import { SkillInstaller } from '../src/core/install';
-import { SkillValidationError } from '../src/core/errors';
 import { SkilletonEnvironment } from '../src/env';
 import { InstallResult, LockedSkill, SkillDescriptor, SkillManifest, SkillLockfile } from '../src/core/types';
 
@@ -46,7 +45,7 @@ function createTestEnv(): TestEnv {
   } as jest.Mocked<Pick<ManifestValidator, 'validate'>>;
 
   const resolver = {
-    resolve: jest.fn<Promise<LockedSkill[]>, [SkillDescriptor[]]>(),
+    resolve: jest.fn<Promise<LockedSkill[]>, [SkillDescriptor[], { lockfile?: SkillLockfile | null }?]>(),
   } as jest.Mocked<Pick<SkillResolver, 'resolve'>>;
 
   const installer = {
@@ -94,7 +93,7 @@ describe('InstallCommand', () => {
 
     await command.run(testEnv.env, { positional: [], flags: {} });
 
-    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills);
+    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills, { lockfile: null });
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
     expect(testEnv.installer.install).toHaveBeenCalledWith(locked, expect.objectContaining({ agent: undefined }));
     expect(warnSpy).toHaveBeenCalledWith('No lockfile detected. Installing skills and creating skilleton.lock.json...');
@@ -117,31 +116,65 @@ describe('InstallCommand', () => {
     expect(logSpy).not.toHaveBeenCalledWith('Created skilleton.lock.json');
   });
 
-  it('installs using existing lockfile entries without resolving again', async () => {
+  it('installs using resolved skills from existing lockfile context', async () => {
     const manifest: SkillManifest = { skills: [baseDescriptor] };
     const locked = { skills: { skill1: baseLockedSkill } };
+    const resolved = [baseLockedSkill];
 
     testEnv.manifestRepo.readManifest.mockResolvedValue(manifest);
     testEnv.manifestRepo.readLockfileIfExists.mockResolvedValue(locked);
+    testEnv.resolver.resolve.mockResolvedValue(resolved);
     testEnv.installer.install.mockResolvedValue([baseInstallResult]);
 
     await command.run(testEnv.env, { positional: [], flags: { agent: 'dev-agent' } });
 
-    expect(testEnv.resolver.resolve).not.toHaveBeenCalled();
-    expect(testEnv.installer.install).toHaveBeenCalledWith(
-      [baseLockedSkill],
-      expect.objectContaining({ agent: 'dev-agent' }),
-    );
+    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills, { lockfile: locked });
+    expect(testEnv.installer.install).toHaveBeenCalledWith(resolved, expect.objectContaining({ agent: 'dev-agent' }));
     expect(testEnv.manifestRepo.writeLockfile).not.toHaveBeenCalled();
   });
 
-  it('throws when a manifest skill is missing from the lockfile', async () => {
+  it('updates lockfile when manifest skill is missing from existing lockfile', async () => {
     const manifest: SkillManifest = { skills: [baseDescriptor] };
+    const resolved = [baseLockedSkill];
 
     testEnv.manifestRepo.readManifest.mockResolvedValue(manifest);
     testEnv.manifestRepo.readLockfileIfExists.mockResolvedValue({ skills: {} });
+    testEnv.resolver.resolve.mockResolvedValue(resolved);
+    testEnv.installer.install.mockResolvedValue([baseInstallResult]);
 
-    await expect(command.run(testEnv.env, { positional: [], flags: {} })).rejects.toThrow(SkillValidationError);
+    await command.run(testEnv.env, { positional: [], flags: {} });
+
+    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills, { lockfile: { skills: {} } });
+    expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith('Updated skilleton.lock.json to match skilleton.json');
+  });
+
+  it('updates lockfile when skills were removed from manifest', async () => {
+    const manifest: SkillManifest = { skills: [baseDescriptor] };
+    const existingLock: SkillLockfile = {
+      skills: {
+        skill1: baseLockedSkill,
+        removedSkill: {
+          name: 'removedSkill',
+          repo: 'owner/removed',
+          path: '.',
+          ref: 'main',
+          commit: 'def456',
+          timestamp: '2023-01-01T00:00:00Z',
+        },
+      },
+    };
+    const resolved = [baseLockedSkill];
+
+    testEnv.manifestRepo.readManifest.mockResolvedValue(manifest);
+    testEnv.manifestRepo.readLockfileIfExists.mockResolvedValue(existingLock);
+    testEnv.resolver.resolve.mockResolvedValue(resolved);
+    testEnv.installer.install.mockResolvedValue([baseInstallResult]);
+
+    await command.run(testEnv.env, { positional: [], flags: {} });
+
+    expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
+    expect(logSpy).toHaveBeenCalledWith('Pruned skilleton.lock.json to match skilleton.json');
   });
 
   it('passes agent flag through to installer', async () => {
@@ -156,6 +189,7 @@ describe('InstallCommand', () => {
 
     await command.run(testEnv.env, { positional: [], flags: { agent: 'qa-agent' } });
 
+    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills, { lockfile: null });
     expect(testEnv.installer.install).toHaveBeenCalledWith(locked, expect.objectContaining({ agent: 'qa-agent' }));
   });
 });

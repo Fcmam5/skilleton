@@ -23,3 +23,16 @@ export function getChangedSkills(nextSkills: LockedSkill[], previous: SkillLockf
     );
   });
 }
+
+export function pruneLockfile(lockfile: SkillLockfile, names: string[]): SkillLockfile {
+  const keep = new Set(names);
+  const nextSkills: SkillLockfile['skills'] = {};
+
+  for (const [name, skill] of Object.entries(lockfile.skills)) {
+    if (keep.has(name)) {
+      nextSkills[name] = skill;
+    }
+  }
+
+  return { skills: nextSkills };
+}
