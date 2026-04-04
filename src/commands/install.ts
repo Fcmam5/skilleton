@@ -11,6 +11,9 @@ export class InstallCommand implements Command {
 
     const existingLock = await env.manifestRepo.readLockfileIfExists();
     const useLock = existingLock !== null;
+    if (!useLock) {
+      console.warn('No lockfile detected. Installing skills and creating skilleton.lock.json...');
+    }
 
     let lockedSkills: LockedSkill[];
     if (useLock && existingLock) {

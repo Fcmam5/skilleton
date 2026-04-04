@@ -69,11 +69,13 @@ describe('InstallCommand', () => {
   let command: InstallCommand;
   let testEnv: TestEnv;
   let logSpy: jest.SpyInstance;
+  let warnSpy: jest.SpyInstance;
 
   beforeEach(() => {
     testEnv = createTestEnv();
     command = new InstallCommand();
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -95,8 +97,24 @@ describe('InstallCommand', () => {
     expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills);
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
     expect(testEnv.installer.install).toHaveBeenCalledWith(locked, expect.objectContaining({ agent: undefined }));
+    expect(warnSpy).toHaveBeenCalledWith('No lockfile detected. Installing skills and creating skilleton.lock.json...');
     expect(logSpy).toHaveBeenCalledWith('Created skilleton.lock.json');
     expect(logSpy).toHaveBeenCalledWith('Installed skill1 @ abc123 → .skilleton/skills/skill1');
+  });
+
+  it('creates lockfile even if ref resolution fails when no lock exists', async () => {
+    const manifest: SkillManifest = { skills: [baseDescriptor] };
+    const resolveError = new Error('cannot resolve ref');
+
+    testEnv.manifestRepo.readManifest.mockResolvedValue(manifest);
+    testEnv.manifestRepo.readLockfileIfExists.mockResolvedValue(null);
+    testEnv.resolver.resolve.mockRejectedValue(resolveError);
+
+    await expect(command.run(testEnv.env, { positional: [], flags: {} })).rejects.toThrow('cannot resolve ref');
+
+    expect(testEnv.manifestRepo.writeLockfile).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('No lockfile detected. Installing skills and creating skilleton.lock.json...');
+    expect(logSpy).not.toHaveBeenCalledWith('Created skilleton.lock.json');
   });
 
   it('installs using existing lockfile entries without resolving again', async () => {
