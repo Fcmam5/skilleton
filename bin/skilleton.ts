@@ -32,7 +32,8 @@ function parseArgs(argv: string[]): { command: string | null; args: CommandArgs 
   for (let i = 0; i < rest.length; i += 1) {
     const token = rest[i];
     if (token.startsWith('--')) {
-      const [flag, value] = token.slice(2).split('=');
+      const [rawFlag, value] = token.slice(2).split('=');
+      const flag = rawFlag === 'h' ? 'help' : rawFlag;
       if (value !== undefined) {
         flags[flag] = value;
         continue;
@@ -45,6 +46,10 @@ function parseArgs(argv: string[]): { command: string | null; args: CommandArgs 
       } else {
         flags[flag] = true;
       }
+    } else if (token.startsWith('-') && token.length > 1) {
+      const rawFlag = token.slice(1);
+      const flag = rawFlag === 'h' ? 'help' : rawFlag;
+      flags[flag] = true;
     } else {
       positional.push(token);
     }
@@ -76,7 +81,7 @@ async function main(): Promise<void> {
   }
 
   // Handle individual command help
-  if (args.flags.help || args.flags.h) {
+  if (args.flags.help) {
     printHelp(command);
     return;
   }
