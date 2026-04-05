@@ -30,6 +30,11 @@ export class NodeFileSystem implements FileSystem {
     await fs.mkdir(target, { recursive: true });
   }
 
+  /**
+   * Creates a new temporary directory.
+   * @param prefix Prefix used for the temporary directory name.
+   * @returns Promise resolving to the created directory path.
+   */
   async mkdtemp(prefix: string): Promise<string> {
     return fs.mkdtemp(prefix);
   }

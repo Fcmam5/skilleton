@@ -94,6 +94,7 @@ export class ExecaGitClient implements GitClient {
   async exportPath(repoPath: string, commit: string, destination: string, subPath?: string): Promise<void> {
     assertSafeGitArg(repoPath, 'repository path');
     assertSafeGitArg(destination, 'destination path');
+    resolveSafeSubPath(repoPath, subPath);
     if (!COMMIT_SHA_PATTERN.test(commit)) {
       throw new SkillInstallError(`Invalid commit SHA: ${commit}`);
     }

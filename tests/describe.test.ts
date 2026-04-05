@@ -248,6 +248,7 @@ function createThrowingProxy(name: string): ProxyHandler<object> {
 class InMemoryFileSystem implements FileSystem {
   private directories = new Set<string>();
   private files = new Map<string, string>();
+  private tempCounter = 0;
 
   constructor() {
     this.directories.add('/');
@@ -275,7 +276,8 @@ class InMemoryFileSystem implements FileSystem {
   }
 
   async mkdtemp(prefix: string): Promise<string> {
-    const tempDir = this.normalize(`${prefix}tmp`);
+    this.tempCounter += 1;
+    const tempDir = this.normalize(`${prefix}tmp-${this.tempCounter}`);
     this.directories.add(tempDir);
     return tempDir;
   }

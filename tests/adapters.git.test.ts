@@ -86,15 +86,7 @@ describe('ExecaGitClient security hardening', () => {
       'Invalid skill path ../escape',
     );
 
-    expect(mockedExeca).toHaveBeenCalledWith(
-      'git',
-      ['-C', '/tmp/cache/repo', 'worktree', 'add', '--force', '--detach', '/tmp/skilleton-wt-123', commit],
-      expect.any(Object),
-    );
-    expect(mockedExeca).toHaveBeenCalledWith(
-      'git',
-      ['-C', '/tmp/cache/repo', 'worktree', 'remove', '--force', '/tmp/skilleton-wt-123'],
-      expect.any(Object),
-    );
+    expect(mockedFs.mkdtemp).not.toHaveBeenCalled();
+    expect(mockedExeca).not.toHaveBeenCalled();
   });
 });

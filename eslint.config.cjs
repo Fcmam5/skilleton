@@ -36,6 +36,14 @@ module.exports = [
               name: 'node:fs/promises',
               message: FILESYSTEM_IMPORT_MESSAGE,
             },
+            {
+              name: 'fs',
+              message: FILESYSTEM_IMPORT_MESSAGE,
+            },
+            {
+              name: 'fs/promises',
+              message: FILESYSTEM_IMPORT_MESSAGE,
+            },
           ],
         },
       ],
