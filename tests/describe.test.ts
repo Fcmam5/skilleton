@@ -207,6 +207,7 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
       return lockfile;
     },
     skillInstallPath(skillName: string) {
+      // eslint-disable-next-line security/detect-object-injection
       return installPaths[skillName] ?? `/repo/.skilleton/skills/${skillName}`;
     },
   };

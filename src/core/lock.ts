@@ -40,10 +40,7 @@ export interface ReconcileLockfileResult {
 
 /** Converts resolved skills into lockfile record format keyed by skill name. */
 export function serializeLockfile(skills: LockedSkill[]): SkillLockfile {
-  const record: SkillLockfile['skills'] = {};
-  for (const skill of skills) {
-    record[skill.name] = skill;
-  }
+  const record = Object.fromEntries(skills.map((skill) => [skill.name, skill])) as SkillLockfile['skills'];
   return { skills: record };
 }
 
@@ -53,8 +50,10 @@ export function getChangedSkills(nextSkills: LockedSkill[], previous: SkillLockf
     return nextSkills;
   }
 
+  const priorByName = new Map(Object.entries(previous.skills));
+
   return nextSkills.filter((skill) => {
-    const prior = previous.skills[skill.name];
+    const prior = priorByName.get(skill.name);
     if (!prior) {
       return true;
     }
@@ -67,13 +66,9 @@ export function getChangedSkills(nextSkills: LockedSkill[], previous: SkillLockf
 /** Removes lockfile entries whose skill names are no longer declared. */
 export function pruneLockfile(lockfile: SkillLockfile, names: string[]): SkillLockfile {
   const keep = new Set(names);
-  const nextSkills: SkillLockfile['skills'] = {};
-
-  for (const [name, skill] of Object.entries(lockfile.skills)) {
-    if (keep.has(name)) {
-      nextSkills[name] = skill;
-    }
-  }
+  const nextSkills = Object.fromEntries(
+    Object.entries(lockfile.skills).filter(([name]) => keep.has(name)),
+  ) as SkillLockfile['skills'];
 
   return { skills: nextSkills };
 }
