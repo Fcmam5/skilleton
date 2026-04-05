@@ -11,13 +11,12 @@ export class MockedFileSystem implements FileSystem {
   }
 
   addDirectory(dir: string): void {
-    const normalized = this.normalize(dir);
-    this.directories.add(normalized);
+    this.addDirectoryTree(this.normalize(dir));
   }
 
   addFile(target: string, content: string): void {
     const normalized = this.normalize(target);
-    this.directories.add(path.dirname(normalized));
+    this.addDirectoryTree(path.dirname(normalized));
     this.files.set(normalized, content);
   }
 
@@ -27,13 +26,13 @@ export class MockedFileSystem implements FileSystem {
   });
 
   ensureDir = jest.fn(async (target: string): Promise<void> => {
-    this.directories.add(this.normalize(target));
+    this.addDirectoryTree(this.normalize(target));
   });
 
   mkdtemp = jest.fn(async (prefix: string): Promise<string> => {
     this.tempCounter += 1;
     const tempDir = this.normalize(`${prefix}tmp-${this.tempCounter}`);
-    this.directories.add(tempDir);
+    this.addDirectoryTree(tempDir);
     return tempDir;
   });
 
@@ -44,7 +43,7 @@ export class MockedFileSystem implements FileSystem {
 
   writeJson = jest.fn(async (target: string, data: unknown): Promise<void> => {
     const normalized = this.normalize(target);
-    this.directories.add(path.dirname(normalized));
+    this.addDirectoryTree(path.dirname(normalized));
     this.files.set(normalized, `${JSON.stringify(data, null, 2)}\n`);
   });
 
@@ -86,25 +85,25 @@ export class MockedFileSystem implements FileSystem {
     if (this.files.has(srcNormalized)) {
       const content = this.files.get(srcNormalized);
       if (content !== undefined) {
-        this.directories.add(path.dirname(destNormalized));
+        this.addDirectoryTree(path.dirname(destNormalized));
         this.files.set(destNormalized, content);
       }
       return;
     }
 
     if (this.directories.has(srcNormalized)) {
-      this.directories.add(destNormalized);
+      this.addDirectoryTree(destNormalized);
       for (const dirPath of Array.from(this.directories)) {
         if (dirPath.startsWith(`${srcNormalized}/`)) {
           const relative = dirPath.slice(srcNormalized.length);
-          this.directories.add(`${destNormalized}${relative}`);
+          this.addDirectoryTree(`${destNormalized}${relative}`);
         }
       }
       for (const [filePath, content] of Array.from(this.files.entries())) {
         if (filePath.startsWith(`${srcNormalized}/`)) {
           const relative = filePath.slice(srcNormalized.length);
           const copiedFilePath = `${destNormalized}${relative}`;
-          this.directories.add(path.dirname(copiedFilePath));
+          this.addDirectoryTree(path.dirname(copiedFilePath));
           this.files.set(copiedFilePath, content);
         }
       }
@@ -116,7 +115,8 @@ export class MockedFileSystem implements FileSystem {
 
   symlink = jest.fn(async (_target: string, dest: string): Promise<void> => {
     const normalizedDest = this.normalize(dest);
-    this.directories.add(path.dirname(normalizedDest));
+    this.files.delete(normalizedDest);
+    this.addDirectoryTree(path.dirname(normalizedDest));
     this.files.set(normalizedDest, '');
   });
 
@@ -145,7 +145,7 @@ export class MockedFileSystem implements FileSystem {
       }
     }
 
-    if (!this.directories.has(normalized) && entries.size === 0) {
+    if (!this.directories.has(normalized)) {
       throw new Error(`Directory not found: ${target}`);
     }
 
@@ -154,6 +154,22 @@ export class MockedFileSystem implements FileSystem {
 
   private normalize(target: string): string {
     return target.replace(/\\/g, '/');
+  }
+
+  private addDirectoryTree(dir: string): void {
+    const normalized = this.normalize(dir);
+    if (!normalized || normalized === '/') {
+      this.directories.add('/');
+      return;
+    }
+
+    const segments = normalized.split('/').filter(Boolean);
+    let current = normalized.startsWith('/') ? '/' : '';
+
+    for (const segment of segments) {
+      current = current === '/' ? `/${segment}` : current ? `${current}/${segment}` : segment;
+      this.directories.add(current);
+    }
   }
 }
 
