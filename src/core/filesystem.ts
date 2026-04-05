@@ -31,6 +31,15 @@ export class NodeFileSystem implements FileSystem {
   }
 
   /**
+   * Creates a new temporary directory.
+   * @param prefix Prefix used for the temporary directory name.
+   * @returns Promise resolving to the created directory path.
+   */
+  async mkdtemp(prefix: string): Promise<string> {
+    return fs.mkdtemp(prefix);
+  }
+
+  /**
    * Reads and parses JSON from disk.
    * @param target JSON file path.
    */

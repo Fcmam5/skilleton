@@ -44,6 +44,7 @@ export interface GitClient {
 export interface FileSystem {
   pathExists(_path: string): Promise<boolean>;
   ensureDir(_path: string): Promise<void>;
+  mkdtemp(_prefix: string): Promise<string>;
   readJson<T>(_path: string): Promise<T>;
   writeJson(_path: string, _data: unknown): Promise<void>;
   readFile(_path: string): Promise<string>;

@@ -2,19 +2,7 @@ import path from 'node:path';
 import { SkillInstaller } from '../src/core/install';
 import { FileSystem, GitClient, LockedSkill } from '../src/core/types';
 import { SkillInstallError } from '../src/core/errors';
-
-const createFsMock = (): jest.Mocked<FileSystem> => ({
-  pathExists: jest.fn(),
-  ensureDir: jest.fn(),
-  readJson: jest.fn(),
-  writeJson: jest.fn(),
-  readFile: jest.fn(),
-  isDirectory: jest.fn(),
-  remove: jest.fn(),
-  copy: jest.fn(),
-  symlink: jest.fn(),
-  readDir: jest.fn(),
-});
+import { createMockedFileSystem } from './helpers/mocked-filesystem';
 
 const createGitMock = (): jest.Mocked<GitClient> => ({
   ensureRepo: jest.fn(),
@@ -36,7 +24,7 @@ describe('SkillInstaller', () => {
   let installer: SkillInstaller;
 
   beforeEach(() => {
-    fsMock = createFsMock();
+    fsMock = createMockedFileSystem();
     gitMock = createGitMock();
     installer = new SkillInstaller(fsMock, gitMock);
     gitMock.ensureRepo.mockResolvedValue('/cache/skills/alpha');

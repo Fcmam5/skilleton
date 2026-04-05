@@ -4,9 +4,10 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | ✅        |
+| >=0.3.1 | ✅        |
+| <0.3.1  | ❌ (deprecated) |
 
-Skilleton CLI is currently pre-1.0, but we treat every tagged release as security-supported until a newer patch is published.
+Versions earlier than `0.3.1` are deprecated due to security fixes (see the [Security Advisory](https://github.com/Fcmam5/skilleton/security/advisories/GHSA-5g3j-89fr-r2vp)). Please upgrade to `0.3.1` or later.
 
 ## Reporting a Vulnerability
 
@@ -34,6 +35,24 @@ Instead, email `au54vz9rk[at]mozmail[.]com` with the details. If you do not rece
 4. **Coordinated disclosure**: we will agree on a public disclosure date once a fix is ready and released
 
 We may invite you to test the fix before release if appropriate.
+
+### Automated Alert Triage (GitHub)
+
+We also monitor and triage GitHub security signals (CodeQL and Dependabot alerts).
+
+- **Initial triage SLA**: within 7 days of an alert opening
+- **Critical/High**: patch or documented mitigation target within 14 days
+- **Medium**: patch target within 30 days
+- **Low**: patch target within 90 days or explicitly risk-accepted with rationale
+
+For each alert, we track:
+
+- affected file/function and exploit preconditions
+- real impact in Skilleton runtime/CLI context
+- patch approach, owner, and target release
+- verification (tests and/or reproduction before/after)
+
+If an alert is a false positive or accepted risk, we record the reason and keep the decision reviewable.
 
 ## Scope
 

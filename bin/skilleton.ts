@@ -20,40 +20,62 @@ const commands: CommandRegistry = {
   audit: new AuditCommand(),
 };
 
+function getCommandHandler(command: string): Command | null {
+  switch (command) {
+    case 'add':
+      return commands.add;
+    case 'install':
+      return commands.install;
+    case 'update':
+      return commands.update;
+    case 'list':
+      return commands.list;
+    case 'describe':
+      return commands.describe;
+    case 'audit':
+      return commands.audit;
+    default:
+      return null;
+  }
+}
+
 function parseArgs(argv: string[]): { command: string | null; args: CommandArgs } {
   if (argv.length === 0) {
     return { command: null, args: { positional: [], flags: {} } };
   }
 
   const [command, ...rest] = argv;
+  const tokens = [...rest];
   const positional: string[] = [];
-  const flags: Record<string, string | boolean> = {};
+  const flagsMap = new Map<string, string | boolean>();
 
-  for (let i = 0; i < rest.length; i += 1) {
-    const token = rest[i];
+  while (tokens.length > 0) {
+    const token = tokens.shift()!;
     if (token.startsWith('--')) {
       const [rawFlag, value] = token.slice(2).split('=');
       const flag = rawFlag === 'h' ? 'help' : rawFlag;
       if (value !== undefined) {
-        flags[flag] = value;
+        flagsMap.set(flag, value);
         continue;
       }
 
-      const next = rest[i + 1];
+      const next = tokens[0];
       if (next && !next.startsWith('-')) {
-        flags[flag] = next;
-        i += 1;
+        flagsMap.set(flag, next);
+        tokens.shift();
       } else {
-        flags[flag] = true;
+        flagsMap.set(flag, true);
       }
     } else if (token.startsWith('-') && token.length > 1) {
       const rawFlag = token.slice(1);
       const flag = rawFlag === 'h' ? 'help' : rawFlag;
-      flags[flag] = true;
+      flagsMap.set(flag, true);
     } else {
       positional.push(token);
     }
   }
+
+  const flags = Object.fromEntries(flagsMap);
 
   return { command, args: { positional, flags } };
 }
@@ -81,7 +103,7 @@ async function main(): Promise<void> {
   }
 
   // Validate command first
-  const handler = commands[command];
+  const handler = getCommandHandler(command);
   if (!handler) {
     console.error(`Unknown command: ${command}`);
     printHelp();

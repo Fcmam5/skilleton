@@ -24,8 +24,13 @@ export function isRepoUrl(spec: string): boolean {
 
 /** Normalizes repository URLs by removing trailing slash and `.git`. */
 export function normalizeRepoUrl(url: string): string {
-  const withoutTrailingSlash = url.replace(/\/+$/, '');
-  return withoutTrailingSlash.replace(/\.git$/i, '');
+  let normalized = url;
+  // Using a deterministic while loop to remove trailing slashes instead of regex
+  // This closes "Polynomial regular expression used on uncontrolled data" warning (code scanning #3)
+  while (normalized.endsWith('/')) {
+    normalized = normalized.slice(0, -1);
+  }
+  return normalized.replace(/\.git$/i, '');
 }
 
 /** Normalizes owner/repo or URL-like specs into a canonical repository URL. */

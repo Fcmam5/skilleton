@@ -21,7 +21,7 @@ export class DescribeCommand implements Command {
       }
 
       const lockfile = await env.manifestRepo.readLockfileIfExists();
-      const locked = lockfile?.skills?.[skillName];
+      const locked = this.getLockedSkillByName(lockfile, skillName);
       const installPath = env.manifestRepo.skillInstallPath(skillName);
       const installed = await env.fs.pathExists(installPath);
 
@@ -42,6 +42,18 @@ export class DescribeCommand implements Command {
       }
       throw error;
     }
+  }
+
+  private getLockedSkillByName(
+    lockfile: { skills: Record<string, LockedSkill> } | null,
+    skillName: string,
+  ): LockedSkill | undefined {
+    if (!lockfile) {
+      return undefined;
+    }
+
+    const skillsByName = new Map(Object.entries(lockfile.skills));
+    return skillsByName.get(skillName);
   }
 
   private printMetadata(
