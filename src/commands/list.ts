@@ -7,7 +7,13 @@ function shortSha(commit?: string): string {
   return commit ? commit.slice(0, 7) : '———';
 }
 
+/** Lists manifest skills with optional lockfile commit information. */
 export class ListCommand implements Command {
+  /**
+   * Prints declared skills in table format or JSON.
+   * @param env Runtime environment.
+   * @param args Parsed command arguments.
+   */
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     try {
       const manifest = await env.manifestRepo.readManifest();

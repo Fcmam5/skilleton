@@ -7,12 +7,26 @@ function resolveAgent(options: InstallOptions): string | null {
   return options.agent ?? process.env.SKILLETON_AGENT ?? process.env.AGENT ?? null;
 }
 
+/**
+ * Skill installer class.
+ *
+ * This class is responsible for installing skills from a locked skills file.
+ * It uses the GitClient to clone and export skills, and the FileSystem to manage files.
+ */
 export class SkillInstaller {
   constructor(
     private readonly fs: FileSystem,
     private readonly git: GitClient,
   ) {}
 
+  /**
+   * Install skills from a locked skills file.
+   *
+   * @param skills - The skills to install.
+   * @param options - The installation options.
+   * @returns A promise that resolves to an array of installation results.
+   * @throws {SkillInstallError} If a skill is missing SKILL.md after export.
+   */
   async install(skills: LockedSkill[], options: InstallOptions = {}): Promise<InstallResult[]> {
     if (!skills.length) {
       return [];

@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["src"],
+  "out": "docs/api",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "sort": ["source-order"],
+  "categorizeByGroup": true,
+  "defaultCategory": "Other",
+  "categoryOrder": [
+    "Environment",
+    "Commands",
+    "Core",
+    "Adapters",
+    "Types",
+    "*"
+  ]
+}

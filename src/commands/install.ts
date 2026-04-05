@@ -2,7 +2,13 @@ import { Command, CommandArgs } from './types';
 import { SkilletonEnvironment } from '../env';
 import { reconcileLockfile } from '../core/lock';
 
+/** Installs all declared skills and reconciles lockfile state. */
 export class InstallCommand implements Command {
+  /**
+   * Validates the manifest, resolves skills, writes lockfile updates, and installs skills.
+   * @param env Runtime environment.
+   * @param args Parsed command arguments.
+   */
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     const manifest = await env.manifestRepo.readManifest();
     env.validator.validate(manifest);

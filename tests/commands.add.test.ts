@@ -92,12 +92,12 @@ function createEnv(manifest?: SkillManifest) {
   };
 
   const env: SkilletonEnvironment = {
-    fs: null as any,
-    git: null as any,
-    resolver: null as any,
-    installer: null as any,
-    manifestRepo: manifestRepo as any,
-    validator: validator as any,
+    fs: null as unknown as SkilletonEnvironment['fs'],
+    git: null as unknown as SkilletonEnvironment['git'],
+    resolver: null as unknown as SkilletonEnvironment['resolver'],
+    installer: null as unknown as SkilletonEnvironment['installer'],
+    manifestRepo: manifestRepo as unknown as SkilletonEnvironment['manifestRepo'],
+    validator: validator as unknown as SkilletonEnvironment['validator'],
   };
 
   return { env, manifestRepo, validator };

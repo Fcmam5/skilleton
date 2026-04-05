@@ -2,14 +2,21 @@ import { LockedSkill, SkillDescriptor, SkillLockfile } from './types';
 import { SkillValidationError } from './errors';
 import { GitRefResolver } from './git-ref-resolver';
 
+/** Optional flags that control descriptor resolution behavior. */
 export interface ResolveOptions {
   lockfile?: SkillLockfile | null;
   strictLock?: boolean;
 }
 
+/** Resolves skill descriptors into locked skills with commit SHAs. */
 export class SkillResolver {
   constructor(private readonly _refResolver: GitRefResolver) {}
 
+  /**
+   * Resolves all descriptors, reusing matching lockfile entries when possible.
+   * @param descriptors Skill descriptors to resolve.
+   * @param options Resolution options.
+   */
   async resolve(descriptors: SkillDescriptor[], options: ResolveOptions = {}): Promise<LockedSkill[]> {
     if (!descriptors.length) {
       return [];

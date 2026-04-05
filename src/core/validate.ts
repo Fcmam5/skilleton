@@ -3,6 +3,7 @@ import formatsPlugin from 'ajv-formats';
 import schema from '../../skilleton.schema.json';
 import { SkillManifest } from './types';
 
+/** Error thrown when manifest validation fails. */
 export class ManifestValidationError extends Error {
   constructor(message: string) {
     super(message);
@@ -10,6 +11,7 @@ export class ManifestValidationError extends Error {
   }
 }
 
+/** Validates `skilleton.json` manifests against schema and semantic rules. */
 export class ManifestValidator {
   private readonly ajv: Ajv;
   private readonly validateFn: ValidateFunction<SkillManifest>;
@@ -25,6 +27,10 @@ export class ManifestValidator {
     this.validateFn = this.ajv.compile<SkillManifest>(schema);
   }
 
+  /**
+   * Validates a manifest and throws on schema or duplicate-name violations.
+   * @param manifest Manifest to validate.
+   */
   public validate(manifest: SkillManifest): void {
     const valid = this.validateFn(manifest);
     if (!valid && this.validateFn.errors) {

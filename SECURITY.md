@@ -3,7 +3,7 @@
 ## Supported Versions
 
 | Version | Supported |
-|---------|-----------|
+| ------- | --------- |
 | 0.1.x   | ✅        |
 
 Skilleton CLI is currently pre-1.0, but we treat every tagged release as security-supported until a newer patch is published.

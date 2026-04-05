@@ -30,11 +30,12 @@ skilleton install  # Installs exact pinned versions
 ## How it works
 
 **skilleton.json** (commit this):
+
 ```json
 {
   "skills": [
     {
-      "name": "jest", 
+      "name": "jest",
       "repo": "Mindrally/skills",
       "path": "jest",
       "ref": "47f47c1"
@@ -44,12 +45,13 @@ skilleton install  # Installs exact pinned versions
 ```
 
 **skilleton.lock.json** (commit this):
+
 ```json
 {
   "skills": {
     "jest": {
       "name": "jest",
-      "repo": "Mindrally/skills", 
+      "repo": "Mindrally/skills",
       "path": "jest",
       "ref": "47f47c1",
       "commit": "abc123def456...",
@@ -65,7 +67,6 @@ And add the following to your `.gitignore`:
 .skilleton/
 ```
 
-
 ## Commands
 
 ```bash
@@ -75,6 +76,29 @@ skilleton update                     # Refresh lockfile; reinstall only changed 
 skilleton list [--format=table|json] # Show installed skills
 skilleton describe <skill>           # Inspect metadata, install tree, SKILL.md header
 skilleton validate                   # Check skill structure and security
+```
+
+### Programmatic usage
+
+Skilleton can also be used from scripts via the package API:
+
+```js
+const { createEnvironment, AddCommand, InstallCommand } = require('skilleton');
+
+async function run() {
+  const env = createEnvironment(process.cwd());
+
+  const add = new AddCommand();
+  await add.run(env, { positional: ['mindrally/skills/jest@main'], flags: {} });
+
+  const install = new InstallCommand();
+  await install.run(env, { positional: [], flags: {} });
+}
+
+run().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 ```
 
 ### Lockfile behavior
@@ -93,6 +117,7 @@ skilleton validate                   # Check skill structure and security
 The `list` command shows all installed skills with their repository, path, ref, and commit information. It supports two output formats:
 
 **Table format (default):**
+
 ```bash
 skilleton list
 # ┌─────────┬───────────────────────┬───────────────────────────────────────┬───────────┬───────────┐
@@ -104,6 +129,7 @@ skilleton list
 ```
 
 **JSON format (for scripts/parsing):**
+
 ```bash
 skilleton list --format=json
 # [

@@ -79,6 +79,7 @@ function normalizeSegments(spec: string): string[] {
   return segments;
 }
 
+/** Parses user skill input into a normalized descriptor (`name`, `repo`, `path`, `ref`). */
 export function parseSkillInput(input: string): SkillDescriptor {
   if (!input || typeof input !== 'string') {
     throw INVALID_FORMAT_ERROR;

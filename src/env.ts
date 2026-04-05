@@ -6,6 +6,7 @@ import { SkillResolver } from './core/resolve';
 import { SkillInstaller } from './core/install';
 import { GitRefResolver } from './core/git-ref-resolver';
 
+/** Runtime service container used by commands and programmatic APIs. */
 export interface SkilletonEnvironment {
   fs: NodeFileSystem;
   validator: ManifestValidator;
@@ -15,6 +16,11 @@ export interface SkilletonEnvironment {
   installer: SkillInstaller;
 }
 
+/**
+ * Creates the default Skilleton runtime environment.
+ * @param cwd Working directory used for manifest and lockfile operations.
+ * @returns A configured Skilleton environment.
+ */
 export function createEnvironment(cwd: string = process.cwd()): SkilletonEnvironment {
   const fs = new NodeFileSystem();
   const validator = new ManifestValidator();
