@@ -80,17 +80,18 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Handle individual command help
-  if (args.flags.help) {
-    printHelp(command);
-    return;
-  }
-
+  // Validate command first
   const handler = commands[command];
   if (!handler) {
     console.error(`Unknown command: ${command}`);
     printHelp();
     process.exitCode = 1;
+    return;
+  }
+
+  // Handle individual command help (only for known commands)
+  if (args.flags.help) {
+    printHelp(command);
     return;
   }
 
