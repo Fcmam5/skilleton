@@ -3,6 +3,7 @@ import { DescribeCommand } from '../src/commands/describe';
 import { SkilletonEnvironment } from '../src/env';
 import { FileSystem, SkillLockfile, SkillManifest } from '../src/core/types';
 import { ManifestNotFoundError } from '../src/core/errors';
+import { createMockedFileSystem } from './helpers/mocked-filesystem';
 
 describe('DescribeCommand', () => {
   let consoleLogSpy: jest.SpyInstance;
@@ -85,7 +86,7 @@ describe('DescribeCommand', () => {
       ],
     };
 
-    const fs = new InMemoryFileSystem();
+    const fs = createMockedFileSystem();
     fs.addDirectory(installPath);
     fs.addDirectory(path.join(installPath, 'rules'));
     fs.addFile(
@@ -131,7 +132,7 @@ describe('DescribeCommand', () => {
       ],
     };
 
-    const fs = new InMemoryFileSystem();
+    const fs = createMockedFileSystem();
     fs.addDirectory(installPath);
     fs.addFile(path.join(installPath, 'README.md'), '# Readme');
     const env = createEnv({ manifest, installPaths: { [skillName]: installPath }, fileSystem: fs });
@@ -158,7 +159,7 @@ describe('DescribeCommand', () => {
       ],
     };
 
-    const fs = new InMemoryFileSystem();
+    const fs = createMockedFileSystem();
     fs.addDirectory(installPath);
     fs.addFile(path.join(installPath, 'SKILL.md'), '# Hello world');
     const env = createEnv({ manifest, installPaths: { [skillName]: installPath }, fileSystem: fs });
@@ -193,7 +194,7 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
     options.manifest ?? ({ $schema: './skilleton.schema.json', skills: [] } as SkillManifest);
   const lockfile = options.lockfile ?? null;
   const installPaths = options.installPaths ?? {};
-  const fs = options.fileSystem ?? new InMemoryFileSystem();
+  const fs = options.fileSystem ?? createMockedFileSystem();
   const manifestError = options.manifestError ?? null;
 
   const manifestRepo = {
@@ -243,118 +244,4 @@ function createThrowingProxy(name: string): ProxyHandler<object> {
       },
     },
   );
-}
-
-class InMemoryFileSystem implements FileSystem {
-  private directories = new Set<string>();
-  private files = new Map<string, string>();
-  private tempCounter = 0;
-
-  constructor() {
-    this.directories.add('/');
-  }
-
-  addDirectory(dir: string): void {
-    const normalized = this.normalize(dir);
-    this.directories.add(normalized);
-  }
-
-  addFile(target: string, content: string): void {
-    const normalized = this.normalize(target);
-    const dir = path.dirname(normalized);
-    this.directories.add(dir);
-    this.files.set(normalized, content);
-  }
-
-  async pathExists(target: string): Promise<boolean> {
-    const normalized = this.normalize(target);
-    return this.directories.has(normalized) || this.files.has(normalized);
-  }
-
-  async ensureDir(target: string): Promise<void> {
-    this.directories.add(this.normalize(target));
-  }
-
-  async mkdtemp(prefix: string): Promise<string> {
-    this.tempCounter += 1;
-    const tempDir = this.normalize(`${prefix}tmp-${this.tempCounter}`);
-    this.directories.add(tempDir);
-    return tempDir;
-  }
-
-  async readJson<T>(_path: string): Promise<T> {
-    throw new Error('Not implemented');
-  }
-
-  async writeJson(_path: string, _data: unknown): Promise<void> {
-    throw new Error('Not implemented');
-  }
-
-  async readFile(target: string): Promise<string> {
-    const normalized = this.normalize(target);
-    const content = this.files.get(normalized);
-    if (content === undefined) {
-      throw new Error(`File not found: ${target}`);
-    }
-    return content;
-  }
-
-  async isDirectory(target: string): Promise<boolean> {
-    return this.directories.has(this.normalize(target));
-  }
-
-  async remove(_path: string): Promise<void> {
-    throw new Error('Not implemented');
-  }
-
-  async copy(_src: string, _dest: string): Promise<void> {
-    throw new Error('Not implemented');
-  }
-
-  async symlink(_target: string, _path: string): Promise<void> {
-    throw new Error('Not implemented');
-  }
-
-  async readDir(target: string): Promise<string[]> {
-    const normalized = this.normalize(target);
-    const entries = new Set<string>();
-    const prefix = normalized.endsWith('/') ? normalized : `${normalized}/`;
-
-    for (const dir of this.directories) {
-      if (dir === normalized) {
-        continue;
-      }
-      if (!dir.startsWith(prefix)) {
-        continue;
-      }
-      const relative = dir.slice(prefix.length);
-      if (relative.length === 0) {
-        continue;
-      }
-      const segment = relative.split('/')[0];
-      entries.add(segment);
-    }
-
-    for (const filePath of this.files.keys()) {
-      if (!filePath.startsWith(prefix)) {
-        continue;
-      }
-      const relative = filePath.slice(prefix.length);
-      if (relative.length === 0) {
-        continue;
-      }
-      const segment = relative.split('/')[0];
-      entries.add(segment);
-    }
-
-    if (!this.directories.has(normalized) && entries.size === 0) {
-      throw new Error(`Directory not found: ${target}`);
-    }
-
-    return Array.from(entries);
-  }
-
-  private normalize(target: string): string {
-    return target.replace(/\\/g, '/');
-  }
 }

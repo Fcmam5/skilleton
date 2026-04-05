@@ -1,31 +1,17 @@
 import { execa } from 'execa';
 import { ExecaGitClient } from '../src/adapters/git';
 import { SkillInstallError } from '../src/core/errors';
-import { FileSystem } from '../src/core/types';
+import { MockedFileSystem, createMockedFileSystem } from './helpers/mocked-filesystem';
 
 jest.mock('execa');
 
-const createFsMock = (): jest.Mocked<FileSystem> => ({
-  pathExists: jest.fn(),
-  ensureDir: jest.fn(),
-  mkdtemp: jest.fn(),
-  readJson: jest.fn(),
-  writeJson: jest.fn(),
-  readFile: jest.fn(),
-  isDirectory: jest.fn(),
-  remove: jest.fn(),
-  copy: jest.fn(),
-  symlink: jest.fn(),
-  readDir: jest.fn(),
-});
-
 describe('ExecaGitClient security hardening', () => {
-  let mockedFs: jest.Mocked<FileSystem>;
+  let mockedFs: MockedFileSystem;
   const mockedExeca = execa as unknown as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedFs = createFsMock();
+    mockedFs = createMockedFileSystem();
     mockedFs.pathExists.mockResolvedValue(true);
     mockedFs.ensureDir.mockResolvedValue(undefined);
     mockedFs.remove.mockResolvedValue(undefined);

@@ -9,6 +9,7 @@ const config = {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.ts'],
 };
 
 module.exports = config;
