@@ -1,20 +1,30 @@
+const tseslint = require('typescript-eslint');
+const globals = require('globals');
+
 module.exports = [
   {
-    ignores: ['dist/**', 'package-lock.json', '**/*.json'],
+    ignores: ['dist/**', 'coverage/**', 'package-lock.json', '**/*.json'],
   },
+  ...tseslint.configs.recommended,
   {
     files: ['**/*.ts'],
-    plugins: { '@typescript-eslint': require('typescript-eslint') },
     languageOptions: {
-      globals: require('globals').node,
-      parser: require('typescript-eslint').parser,
+      globals: globals.node,
+      parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'commonjs',
+        sourceType: 'module',
       },
     },
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    },
+  },
+  {
+    files: ['eslint.config.cjs'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
     },
   },
 ];

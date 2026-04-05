@@ -212,12 +212,12 @@ function createEnv(options: CreateEnvOptions = {}): SkilletonEnvironment {
   };
 
   return {
-    fs: fs as any,
-    validator: createThrowingProxy('validator') as any,
-    manifestRepo: manifestRepo as any,
-    git: createThrowingProxy('git') as any,
-    resolver: createThrowingProxy('resolver') as any,
-    installer: createThrowingProxy('installer') as any,
+    fs: fs as unknown as SkilletonEnvironment['fs'],
+    validator: createThrowingProxy('validator') as unknown as SkilletonEnvironment['validator'],
+    manifestRepo: manifestRepo as unknown as SkilletonEnvironment['manifestRepo'],
+    git: createThrowingProxy('git') as unknown as SkilletonEnvironment['git'],
+    resolver: createThrowingProxy('resolver') as unknown as SkilletonEnvironment['resolver'],
+    installer: createThrowingProxy('installer') as unknown as SkilletonEnvironment['installer'],
   };
 }
 

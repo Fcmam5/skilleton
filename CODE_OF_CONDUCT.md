@@ -100,6 +100,7 @@ This Code of Conduct is adapted from the [Contributor Covenant](https://www.cont
 ## Contact
 
 For questions about this Code of Conduct, please contact:
+
 - Email: `au54vz9rk[at]mozmail[.]com`
 - GitHub: [Create an issue](https://github.com/fcmam5/skilleton/issues/new)
 

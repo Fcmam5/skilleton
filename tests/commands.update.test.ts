@@ -53,8 +53,8 @@ function createTestEnv(): TestEnv {
   } as jest.Mocked<Pick<SkillInstaller, 'install'>>;
 
   const env = {
-    fs: {} as any,
-    git: {} as any,
+    fs: {} as unknown as SkilletonEnvironment['fs'],
+    git: {} as unknown as SkilletonEnvironment['git'],
     manifestRepo: manifestRepo as unknown as ManifestRepository,
     validator: validator as unknown as ManifestValidator,
     resolver: resolver as unknown as SkillResolver,

@@ -37,19 +37,19 @@ export interface InstallResult {
 }
 
 export interface GitClient {
-  ensureRepo(repo: string, destination?: string): Promise<string>;
-  exportPath(repoPath: string, commit: string, destination: string, subPath?: string): Promise<void>;
+  ensureRepo(_repo: string, _destination?: string): Promise<string>;
+  exportPath(_repoPath: string, _commit: string, _destination: string, _subPath?: string): Promise<void>;
 }
 
 export interface FileSystem {
-  pathExists(path: string): Promise<boolean>;
-  ensureDir(path: string): Promise<void>;
-  readJson<T>(path: string): Promise<T>;
-  writeJson(path: string, data: unknown): Promise<void>;
-  readFile(path: string): Promise<string>;
-  isDirectory(path: string): Promise<boolean>;
-  remove(path: string): Promise<void>;
-  copy(src: string, dest: string): Promise<void>;
-  symlink(target: string, path: string): Promise<void>;
-  readDir(path: string): Promise<string[]>;
+  pathExists(_path: string): Promise<boolean>;
+  ensureDir(_path: string): Promise<void>;
+  readJson<T>(_path: string): Promise<T>;
+  writeJson(_path: string, _data: unknown): Promise<void>;
+  readFile(_path: string): Promise<string>;
+  isDirectory(_path: string): Promise<boolean>;
+  remove(_path: string): Promise<void>;
+  copy(_src: string, _dest: string): Promise<void>;
+  symlink(_target: string, _path: string): Promise<void>;
+  readDir(_path: string): Promise<string[]>;
 }

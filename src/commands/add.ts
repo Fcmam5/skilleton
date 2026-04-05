@@ -4,7 +4,13 @@ import { SkillManifest, SkillDescriptor } from '../core/types';
 import { SkilletonEnvironment } from '../env';
 import { InstallCommand } from './install';
 
+/** Adds a skill descriptor to the manifest, then installs skills. */
 export class AddCommand implements Command {
+  /**
+   * Adds or replaces a skill from CLI input.
+   * @param env Runtime environment.
+   * @param args Parsed command arguments.
+   */
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
     const [input] = args.positional;
     if (!input) {
