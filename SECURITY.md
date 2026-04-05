@@ -4,9 +4,10 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 0.1.x   | ✅        |
+| >=0.3.1 | ✅        |
+| <0.3.1  | ❌ (deprecated) |
 
-Skilleton CLI is currently pre-1.0, but we treat every tagged release as security-supported until a newer patch is published.
+Versions earlier than `0.3.1` are deprecated due to security fixes (see the [Security Advisory](https://github.com/Fcmam5/skilleton/security/advisories/GHSA-5g3j-89fr-r2vp)). Please upgrade to `0.3.1` or later.
 
 ## Reporting a Vulnerability
 
