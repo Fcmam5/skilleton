@@ -1,24 +1,15 @@
-import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execa } from 'execa';
-import { GitClient } from '../core/types';
+import { FileSystem, GitClient } from '../core/types';
 import { getCacheRoot } from '../core/config';
 import { ensureRepoUrl, repoCacheKey } from '../core/repos';
 import { SkillInstallError } from '../core/errors';
+import { NodeFileSystem } from '../core/filesystem';
 
 // Reference: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection
 // Pattern to match a 40-character hexadecimal SHA-1 hash
 const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
-
-async function pathExists(target: string): Promise<boolean> {
-  try {
-    await fs.access(target);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 // Rejects values that could be interpreted as git options or null bytes
 // This is a security measure to prevent command injection when passing values to git commands as arguments
@@ -50,7 +41,10 @@ function resolveSafeSubPath(baseDir: string, subPath?: string): string {
 
 /** Git client implementation backed by `execa` shell commands. */
 export class ExecaGitClient implements GitClient {
-  constructor(private readonly cacheRoot = getCacheRoot()) {}
+  constructor(
+    private readonly cacheRoot = getCacheRoot(),
+    private readonly fs: FileSystem = new NodeFileSystem(),
+  ) {}
 
   /**
    * Ensures a repository is present in local cache and fetches updates when already cloned.
@@ -67,8 +61,8 @@ export class ExecaGitClient implements GitClient {
     assertSafeGitArg(repoCachePath, 'repository cache path');
     assertSafeGitArg(cloneSource, 'repository URL');
 
-    if (!(await pathExists(repoCachePath))) {
-      await fs.mkdir(path.dirname(repoCachePath), { recursive: true });
+    if (!(await this.fs.pathExists(repoCachePath))) {
+      await this.fs.ensureDir(path.dirname(repoCachePath));
       // Security: Validate paths to prevent command injection
       await execa('git', ['clone', '--filter=blob:none', '--', cloneSource, repoCachePath], {
         timeout: 30000,
@@ -104,7 +98,7 @@ export class ExecaGitClient implements GitClient {
       throw new SkillInstallError(`Invalid commit SHA: ${commit}`);
     }
 
-    const worktreeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skilleton-wt-'));
+    const worktreeDir = await this.fs.mkdtemp(path.join(os.tmpdir(), 'skilleton-wt-'));
     const gitEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
 
     try {
@@ -117,13 +111,12 @@ export class ExecaGitClient implements GitClient {
       });
 
       const sourcePath = resolveSafeSubPath(worktreeDir, subPath);
-      if (!(await pathExists(sourcePath))) {
+      if (!(await this.fs.pathExists(sourcePath))) {
         throw new SkillInstallError(`Skill path ${subPath ?? '.'} not found in repository ${repoPath}`);
       }
 
-      await fs.rm(destination, { recursive: true, force: true });
-      await fs.mkdir(path.dirname(destination), { recursive: true });
-      await fs.cp(sourcePath, destination, { recursive: true });
+      await this.fs.remove(destination);
+      await this.fs.copy(sourcePath, destination);
     } catch (error) {
       throw new SkillInstallError(
         `Failed to export ${subPath ?? '.'} from ${repoPath}@${commit}: ${(error as Error).message}`,
@@ -136,7 +129,7 @@ export class ExecaGitClient implements GitClient {
         stdout: 'pipe',
         stderr: 'pipe',
       }).catch(() => undefined);
-      await fs.rm(worktreeDir, { recursive: true, force: true }).catch(() => undefined);
+      await this.fs.remove(worktreeDir).catch(() => undefined);
     }
   }
 }

@@ -6,6 +6,7 @@ import { SkillInstallError } from '../src/core/errors';
 const createFsMock = (): jest.Mocked<FileSystem> => ({
   pathExists: jest.fn(),
   ensureDir: jest.fn(),
+  mkdtemp: jest.fn(),
   readJson: jest.fn(),
   writeJson: jest.fn(),
   readFile: jest.fn(),

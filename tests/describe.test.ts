@@ -274,6 +274,12 @@ class InMemoryFileSystem implements FileSystem {
     this.directories.add(this.normalize(target));
   }
 
+  async mkdtemp(prefix: string): Promise<string> {
+    const tempDir = this.normalize(`${prefix}tmp`);
+    this.directories.add(tempDir);
+    return tempDir;
+  }
+
   async readJson<T>(_path: string): Promise<T> {
     throw new Error('Not implemented');
   }

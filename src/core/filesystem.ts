@@ -30,6 +30,10 @@ export class NodeFileSystem implements FileSystem {
     await fs.mkdir(target, { recursive: true });
   }
 
+  async mkdtemp(prefix: string): Promise<string> {
+    return fs.mkdtemp(prefix);
+  }
+
   /**
    * Reads and parses JSON from disk.
    * @param target JSON file path.
