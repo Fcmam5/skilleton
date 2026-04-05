@@ -38,6 +38,6 @@ export function getRepoCachePath(repo: string): string {
   return path.join(getCacheRoot(), repoCacheKey(repo));
 }
 
-export function schemaRelativePath(): string {
+export function schemaUrl(): string {
   return `https://raw.githubusercontent.com/Fcmam5/skilleton/v${packageJson.version}/${SCHEMA_BASENAME}`;
 }

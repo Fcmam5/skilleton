@@ -1,6 +1,6 @@
 import { Command, CommandArgs } from './types';
 import { SkilletonEnvironment } from '../env';
-import { getChangedSkills, pruneLockfile, serializeLockfile } from '../core/lock';
+import { reconcileLockfile } from '../core/lock';
 
 export class UpdateCommand implements Command {
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
@@ -16,24 +16,27 @@ export class UpdateCommand implements Command {
       return;
     }
 
-    const manifestSkillNames = manifest.skills.map((skill) => skill.name);
-    const prunedLock = pruneLockfile(existingLock, manifestSkillNames);
-
-    const resolved = await env.resolver.resolve(manifest.skills, {
-      lockfile: prunedLock,
+    const reconciliation = await reconcileLockfile({
+      skills: manifest.skills,
+      existingLock,
+      resolveSkills: env.resolver.resolve.bind(env.resolver),
+      writeLockfile: env.manifestRepo.writeLockfile.bind(env.manifestRepo),
     });
-    const changed = getChangedSkills(resolved, prunedLock);
-    const nextLockfile = serializeLockfile(resolved);
-    const lockCountChanged = Object.keys(prunedLock.skills).length !== Object.keys(nextLockfile.skills).length;
-    const prunedRemovedEntries = Object.keys(existingLock.skills).length !== Object.keys(prunedLock.skills).length;
+    const { changed, prunedRemovedEntries, lockCountChanged, wroteLockfile } = reconciliation;
 
     if (changed.length === 0 && !lockCountChanged && !prunedRemovedEntries) {
       console.log('All skills already up to date.');
       return;
     }
 
-    await env.manifestRepo.writeLockfile(nextLockfile);
     if (changed.length === 0) {
+      if (wroteLockfile) {
+        console.log('Pruned skilleton.lock.json to match skilleton.json');
+      }
+      return;
+    }
+
+    if (!wroteLockfile) {
       console.log('Pruned skilleton.lock.json to match skilleton.json');
       return;
     }

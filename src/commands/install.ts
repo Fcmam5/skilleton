@@ -1,7 +1,6 @@
 import { Command, CommandArgs } from './types';
 import { SkilletonEnvironment } from '../env';
-import { LockedSkill } from '../core/types';
-import { getChangedSkills, pruneLockfile, serializeLockfile } from '../core/lock';
+import { reconcileLockfile } from '../core/lock';
 
 export class InstallCommand implements Command {
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
@@ -13,35 +12,27 @@ export class InstallCommand implements Command {
       console.warn('No lockfile detected. Installing skills and creating skilleton.lock.json...');
     }
 
-    const manifestSkillNames = manifest.skills.map((skill) => skill.name);
-    const prunedLock = existingLock ? pruneLockfile(existingLock, manifestSkillNames) : null;
-
-    const lockedSkills: LockedSkill[] = await env.resolver.resolve(manifest.skills, {
-      lockfile: prunedLock,
+    const reconciliation = await reconcileLockfile({
+      skills: manifest.skills,
+      existingLock,
+      resolveSkills: env.resolver.resolve.bind(env.resolver),
+      writeLockfile: env.manifestRepo.writeLockfile.bind(env.manifestRepo),
     });
-    const nextLockfile = serializeLockfile(lockedSkills);
+    const { resolvedSkills, changed, prunedRemovedEntries, lockCountChanged, wroteLockfile, createdLockfile } =
+      reconciliation;
 
-    if (!existingLock) {
-      await env.manifestRepo.writeLockfile(nextLockfile);
+    if (createdLockfile) {
       console.log('Created skilleton.lock.json');
-    } else {
-      const lockForComparison = prunedLock!;
-      const changed = getChangedSkills(lockedSkills, lockForComparison);
-      const lockCountChanged = Object.keys(lockForComparison.skills).length !== Object.keys(nextLockfile.skills).length;
-      const prunedRemovedEntries =
-        Object.keys(existingLock.skills).length !== Object.keys(lockForComparison.skills).length;
-      if (changed.length > 0 || lockCountChanged || prunedRemovedEntries) {
-        await env.manifestRepo.writeLockfile(nextLockfile);
-        if (prunedRemovedEntries && changed.length === 0 && !lockCountChanged) {
-          console.log('Pruned skilleton.lock.json to match skilleton.json');
-        } else {
-          console.log('Updated skilleton.lock.json to match skilleton.json');
-        }
+    } else if (wroteLockfile) {
+      if (prunedRemovedEntries && changed.length === 0 && !lockCountChanged) {
+        console.log('Pruned skilleton.lock.json to match skilleton.json');
+      } else {
+        console.log('Updated skilleton.lock.json to match skilleton.json');
       }
     }
 
     const agentFlag = this.parseAgentFlag(args);
-    const results = await env.installer.install(lockedSkills, {
+    const results = await env.installer.install(resolvedSkills, {
       agent: agentFlag,
     });
 

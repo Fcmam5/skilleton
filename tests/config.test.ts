@@ -9,7 +9,7 @@ import {
   getAgentSymlinkPath,
   getCacheRoot,
   getRepoCachePath,
-  schemaRelativePath,
+  schemaUrl,
 } from '../src/core/config';
 import { repoCacheKey } from '../src/core/repos';
 
@@ -66,7 +66,7 @@ describe('config helpers', () => {
 
   describe('schema path', () => {
     it('returns the versioned remote schema URL', () => {
-      const path = schemaRelativePath();
+      const path = schemaUrl();
       expect(path).toBe(
         `https://raw.githubusercontent.com/Fcmam5/skilleton/v${packageJson.version}/skilleton.schema.json`,
       );

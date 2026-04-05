@@ -85,8 +85,8 @@ skilleton validate                   # Check skill structure and security
   - adds missing skills,
   - prunes skills removed from `skilleton.json`,
   - refreshes changed refs/commits.
-- `skilleton update` also reconciles the lockfile, but only reinstalls skills whose pinned commit actually changed.
-- If only pruning is needed, `update` rewrites `skilleton.lock.json` and exits without reinstalling skills.
+- `skilleton update` reconciles the lockfile and reinstalls skills detected as changed (repo, path, ref, or commit).
+- If only pruning is needed, `update` rewrites `skilleton.lock.json` and exits without reinstalling skills; note that ref changes may still trigger reinstalls even when the resolved commit is unchanged.
 
 ### List Command
 

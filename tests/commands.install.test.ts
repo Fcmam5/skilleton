@@ -101,7 +101,7 @@ describe('InstallCommand', () => {
     expect(logSpy).toHaveBeenCalledWith('Installed skill1 @ abc123 → .skilleton/skills/skill1');
   });
 
-  it('creates lockfile even if ref resolution fails when no lock exists', async () => {
+  it('does not create lockfile when ref resolution fails and no lock exists', async () => {
     const manifest: SkillManifest = { skills: [baseDescriptor] };
     const resolveError = new Error('cannot resolve ref');
 
@@ -174,6 +174,7 @@ describe('InstallCommand', () => {
     await command.run(testEnv.env, { positional: [], flags: {} });
 
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
+    expect(testEnv.installer.install).toHaveBeenCalledWith(resolved, expect.objectContaining({ agent: undefined }));
     expect(logSpy).toHaveBeenCalledWith('Pruned skilleton.lock.json to match skilleton.json');
   });
 

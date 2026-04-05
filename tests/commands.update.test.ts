@@ -117,6 +117,13 @@ describe('UpdateCommand', () => {
 
     await command.run(testEnv.env, { positional: [], flags: {} });
 
+    expect(testEnv.resolver.resolve).toHaveBeenCalledWith(manifest.skills, {
+      lockfile: {
+        skills: {
+          skill1: baseLockedSkill,
+        },
+      },
+    });
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith('Pruned skilleton.lock.json to match skilleton.json');
     expect(testEnv.installer.install).not.toHaveBeenCalled();
@@ -143,10 +150,7 @@ describe('UpdateCommand', () => {
 
     expect(testEnv.manifestRepo.writeLockfile).toHaveBeenCalledTimes(1);
     expect(logSpy).toHaveBeenCalledWith('skilleton.lock.json updated. Reinstalling changed skills...');
-    expect(testEnv.installer.install).toHaveBeenCalledWith(
-      resolved,
-      expect.objectContaining({ agent: 'qa-agent' }),
-    );
+    expect(testEnv.installer.install).toHaveBeenCalledWith(resolved, expect.objectContaining({ agent: 'qa-agent' }));
     expect(logSpy).toHaveBeenCalledWith('Updated skill1 → abc123');
   });
 
