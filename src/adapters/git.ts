@@ -7,6 +7,10 @@ import { getCacheRoot } from '../core/config';
 import { ensureRepoUrl, repoCacheKey } from '../core/repos';
 import { SkillInstallError } from '../core/errors';
 
+// Reference: https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection
+// Pattern to match a 40-character hexadecimal SHA-1 hash
+const COMMIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
+
 async function pathExists(target: string): Promise<boolean> {
   try {
     await fs.access(target);
@@ -14,6 +18,34 @@ async function pathExists(target: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// Rejects values that could be interpreted as git options or null bytes
+// This is a security measure to prevent command injection when passing values to git commands as arguments
+function assertSafeGitArg(value: string, label: string): void {
+  if (!value || value.includes('\0') || value.startsWith('-')) {
+    throw new SkillInstallError(`Invalid ${label}`);
+  }
+}
+
+// Resolves a sub-path relative to a base directory, ensuring it stays within the base.
+// Rejects absolute paths and paths that would escape the base directory.
+function resolveSafeSubPath(baseDir: string, subPath?: string): string {
+  if (!subPath || subPath === '.') {
+    return baseDir;
+  }
+
+  if (path.isAbsolute(subPath)) {
+    throw new SkillInstallError(`Invalid skill path ${subPath}`);
+  }
+
+  const normalized = path.resolve(baseDir, subPath);
+  const relativeToBase = path.relative(baseDir, normalized);
+  if (relativeToBase.startsWith('..') || path.isAbsolute(relativeToBase)) {
+    throw new SkillInstallError(`Invalid skill path ${subPath}`);
+  }
+
+  return normalized;
 }
 
 /** Git client implementation backed by `execa` shell commands. */
@@ -31,9 +63,14 @@ export class ExecaGitClient implements GitClient {
     const cloneSource = `${repoUrl}.git`.replace(/\.git\.git$/i, '.git');
     const gitEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
 
+    // Security: Validate paths to prevent command injection
+    assertSafeGitArg(repoCachePath, 'repository cache path');
+    assertSafeGitArg(cloneSource, 'repository URL');
+
     if (!(await pathExists(repoCachePath))) {
       await fs.mkdir(path.dirname(repoCachePath), { recursive: true });
-      await execa('git', ['clone', '--filter=blob:none', cloneSource, repoCachePath], {
+      // Security: Validate paths to prevent command injection
+      await execa('git', ['clone', '--filter=blob:none', '--', cloneSource, repoCachePath], {
         timeout: 30000,
         env: gitEnv,
         stdin: 'ignore',
@@ -61,6 +98,12 @@ export class ExecaGitClient implements GitClient {
    * @param subPath Optional subdirectory within the repository.
    */
   async exportPath(repoPath: string, commit: string, destination: string, subPath?: string): Promise<void> {
+    assertSafeGitArg(repoPath, 'repository path');
+    assertSafeGitArg(destination, 'destination path');
+    if (!COMMIT_SHA_PATTERN.test(commit)) {
+      throw new SkillInstallError(`Invalid commit SHA: ${commit}`);
+    }
+
     const worktreeDir = await fs.mkdtemp(path.join(os.tmpdir(), 'skilleton-wt-'));
     const gitEnv = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
 
@@ -73,10 +116,9 @@ export class ExecaGitClient implements GitClient {
         stderr: 'pipe',
       });
 
-      const relative = subPath && subPath !== '.' ? subPath : undefined;
-      const sourcePath = relative ? path.join(worktreeDir, relative) : worktreeDir;
+      const sourcePath = resolveSafeSubPath(worktreeDir, subPath);
       if (!(await pathExists(sourcePath))) {
-        throw new SkillInstallError(`Skill path ${relative ?? '.'} not found in repository ${repoPath}`);
+        throw new SkillInstallError(`Skill path ${subPath ?? '.'} not found in repository ${repoPath}`);
       }
 
       await fs.rm(destination, { recursive: true, force: true });

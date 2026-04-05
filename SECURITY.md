@@ -35,6 +35,24 @@ Instead, email `au54vz9rk[at]mozmail[.]com` with the details. If you do not rece
 
 We may invite you to test the fix before release if appropriate.
 
+### Automated Alert Triage (GitHub)
+
+We also monitor and triage GitHub security signals (CodeQL and Dependabot alerts).
+
+- **Initial triage SLA**: within 7 days of an alert opening
+- **Critical/High**: patch or documented mitigation target within 14 days
+- **Medium**: patch target within 30 days
+- **Low**: patch target within 90 days or explicitly risk-accepted with rationale
+
+For each alert, we track:
+
+- affected file/function and exploit preconditions
+- real impact in Skilleton runtime/CLI context
+- patch approach, owner, and target release
+- verification (tests and/or reproduction before/after)
+
+If an alert is a false positive or accepted risk, we record the reason and keep the decision reviewable.
+
 ## Scope
 
 This policy covers:
