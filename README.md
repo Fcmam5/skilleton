@@ -70,12 +70,23 @@ And add the following to your `.gitignore`:
 
 ```bash
 skilleton add <owner/skill[@ref]>    # Add skill and update manifest
-skilleton install                    # Install exact versions from lockfile  
-skilleton update                     # Refresh lockfile and reinstall
+skilleton install                    # Reconcile lockfile with manifest, then install all skills
+skilleton update                     # Refresh lockfile; reinstall only changed skills
 skilleton list [--format=table|json] # Show installed skills
 skilleton describe <skill>           # Inspect metadata, install tree, SKILL.md header
 skilleton validate                   # Check skill structure and security
 ```
+
+### Lockfile behavior
+
+- `skilleton add` updates `skilleton.json` and then runs `install`.
+- `skilleton install` keeps `skilleton.lock.json` in sync with `skilleton.json`:
+  - creates the lockfile if missing,
+  - adds missing skills,
+  - prunes skills removed from `skilleton.json`,
+  - refreshes changed refs/commits.
+- `skilleton update` reconciles the lockfile and reinstalls skills detected as changed (repo, path, ref, or commit).
+- If only pruning is needed, `update` rewrites `skilleton.lock.json` and exits without reinstalling skills; note that ref changes may still trigger reinstalls even when the resolved commit is unchanged.
 
 ### List Command
 

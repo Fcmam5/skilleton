@@ -1,17 +1,17 @@
 {
-  "$schema": "./skilleton.schema.json",
+  "$schema": "https://raw.githubusercontent.com/Fcmam5/skilleton/v0.2.1/skilleton.schema.json",
   "skills": [
     {
       "name": "typescript-magician",
-      "repo": "mcollina/skills",
+      "repo": "https://github.com/mcollina/skills",
       "path": "skills/typescript-magician",
       "ref": "main"
     },
     {
       "name": "jest",
-      "repo": "Mindrally/skills",
+      "repo": "https://github.com/Mindrally/skills",
       "path": "jest",
-      "ref": "47f47c1"
+      "ref": "47f47c12e62f62b5e171bd5af61d0fc24b329701"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { getChangedSkills, serializeLockfile } from '../src/core/lock';
+import { getChangedSkills, pruneLockfile, serializeLockfile } from '../src/core/lock';
 import { LockedSkill, SkillLockfile } from '../src/core/types';
 
 const baseSkills: LockedSkill[] = [
@@ -30,7 +30,10 @@ describe('lock helpers', () => {
     });
 
     it('overwrites duplicate entries with last entry', () => {
-      const duplicateSkills: LockedSkill[] = [...baseSkills, { ...baseSkills[0], commit: '3333333333333333333333333333333333333333' }];
+      const duplicateSkills: LockedSkill[] = [
+        ...baseSkills,
+        { ...baseSkills[0], commit: '3333333333333333333333333333333333333333' },
+      ];
       const lockfile = serializeLockfile(duplicateSkills);
       expect(lockfile.skills.alpha.commit).toBe('3333333333333333333333333333333333333333');
     });
@@ -66,6 +69,23 @@ describe('lock helpers', () => {
       const previous: SkillLockfile = serializeLockfile(baseSkills);
       const changes = getChangedSkills([...baseSkills], previous);
       expect(changes).toEqual([]);
+    });
+  });
+
+  describe('pruneLockfile', () => {
+    it('removes lockfile entries not present in current manifest skills', () => {
+      const previous: SkillLockfile = serializeLockfile(baseSkills);
+      const pruned = pruneLockfile(previous, ['alpha']);
+
+      expect(Object.keys(pruned.skills)).toEqual(['alpha']);
+      expect(pruned.skills.alpha).toEqual(previous.skills.alpha);
+    });
+
+    it('keeps all lockfile entries when all names are still present', () => {
+      const previous: SkillLockfile = serializeLockfile(baseSkills);
+      const pruned = pruneLockfile(previous, ['alpha', 'beta']);
+
+      expect(pruned).toEqual(previous);
     });
   });
 });

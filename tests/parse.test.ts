@@ -1,12 +1,22 @@
 import { parseSkillInput } from '../src/core/parse';
 
 describe('parseSkillInput', () => {
-  it('parses owner/skill with implicit skills repo and default ref', () => {
+  it('parses owner/skill as direct repo with default ref', () => {
     const result = parseSkillInput('mindrally/jest');
     expect(result).toEqual({
       name: 'jest',
-      repo: 'https://github.com/mindrally/skills',
-      path: 'jest',
+      repo: 'https://github.com/mindrally/jest',
+      path: '.',
+      ref: 'main',
+    });
+  });
+
+  it('parses mhdcodes/react-query-skill as direct repo with default ref', () => {
+    const result = parseSkillInput('mhdcodes/react-query-skill');
+    expect(result).toEqual({
+      name: 'react-query-skill',
+      repo: 'https://github.com/mhdcodes/react-query-skill',
+      path: '.',
       ref: 'main',
     });
   });
@@ -18,6 +28,16 @@ describe('parseSkillInput', () => {
       repo: 'https://github.com/Mindrally/skills',
       path: 'chrome-extension-development',
       ref: 'v1.0.0',
+    });
+  });
+
+  it('keeps explicit skills monorepo paths intact', () => {
+    const result = parseSkillInput('mhdcodes/skills/react-query-skill');
+    expect(result).toEqual({
+      name: 'react-query-skill',
+      repo: 'https://github.com/mhdcodes/skills',
+      path: 'react-query-skill',
+      ref: 'main',
     });
   });
 

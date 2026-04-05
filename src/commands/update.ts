@@ -1,6 +1,6 @@
 import { Command, CommandArgs } from './types';
 import { SkilletonEnvironment } from '../env';
-import { getChangedSkills, serializeLockfile } from '../core/lock';
+import { reconcileLockfile } from '../core/lock';
 
 export class UpdateCommand implements Command {
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
@@ -16,15 +16,31 @@ export class UpdateCommand implements Command {
       return;
     }
 
-    const resolved = await env.resolver.resolve(manifest.skills);
-    const changed = getChangedSkills(resolved, existingLock);
+    const reconciliation = await reconcileLockfile({
+      skills: manifest.skills,
+      existingLock,
+      resolveSkills: env.resolver.resolve.bind(env.resolver),
+      writeLockfile: env.manifestRepo.writeLockfile.bind(env.manifestRepo),
+    });
+    const { changed, prunedRemovedEntries, lockCountChanged, wroteLockfile } = reconciliation;
 
-    if (changed.length === 0) {
+    if (changed.length === 0 && !lockCountChanged && !prunedRemovedEntries) {
       console.log('All skills already up to date.');
       return;
     }
 
-    await env.manifestRepo.writeLockfile(serializeLockfile(resolved));
+    if (changed.length === 0) {
+      if (wroteLockfile) {
+        console.log('Pruned skilleton.lock.json to match skilleton.json');
+      }
+      return;
+    }
+
+    if (!wroteLockfile) {
+      console.log('Pruned skilleton.lock.json to match skilleton.json');
+      return;
+    }
+
     console.log('skilleton.lock.json updated. Reinstalling changed skills...');
 
     const agentFlag = typeof args.flags.agent === 'string' ? (args.flags.agent as string) : undefined;

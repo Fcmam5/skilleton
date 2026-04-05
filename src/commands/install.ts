@@ -1,8 +1,6 @@
 import { Command, CommandArgs } from './types';
 import { SkilletonEnvironment } from '../env';
-import { LockedSkill, SkillDescriptor } from '../core/types';
-import { SkillValidationError } from '../core/errors';
-import { serializeLockfile } from '../core/lock';
+import { reconcileLockfile } from '../core/lock';
 
 export class InstallCommand implements Command {
   async run(env: SkilletonEnvironment, args: CommandArgs): Promise<void> {
@@ -10,25 +8,31 @@ export class InstallCommand implements Command {
     env.validator.validate(manifest);
 
     const existingLock = await env.manifestRepo.readLockfileIfExists();
-    const useLock = existingLock !== null;
+    if (!existingLock) {
+      console.warn('No lockfile detected. Installing skills and creating skilleton.lock.json...');
+    }
 
-    let lockedSkills: LockedSkill[];
-    if (useLock && existingLock) {
-      lockedSkills = manifest.skills.map((skill: SkillDescriptor) => {
-        const locked = existingLock.skills[skill.name];
-        if (!locked) {
-          throw new SkillValidationError(`Skill ${skill.name} missing from lockfile. Run "skilleton update".`);
-        }
-        return locked;
-      });
-    } else {
-      lockedSkills = await env.resolver.resolve(manifest.skills);
-      await env.manifestRepo.writeLockfile(serializeLockfile(lockedSkills));
+    const reconciliation = await reconcileLockfile({
+      skills: manifest.skills,
+      existingLock,
+      resolveSkills: env.resolver.resolve.bind(env.resolver),
+      writeLockfile: env.manifestRepo.writeLockfile.bind(env.manifestRepo),
+    });
+    const { resolvedSkills, changed, prunedRemovedEntries, lockCountChanged, wroteLockfile, createdLockfile } =
+      reconciliation;
+
+    if (createdLockfile) {
       console.log('Created skilleton.lock.json');
+    } else if (wroteLockfile) {
+      if (prunedRemovedEntries && changed.length === 0 && !lockCountChanged) {
+        console.log('Pruned skilleton.lock.json to match skilleton.json');
+      } else {
+        console.log('Updated skilleton.lock.json to match skilleton.json');
+      }
     }
 
     const agentFlag = this.parseAgentFlag(args);
-    const results = await env.installer.install(lockedSkills, {
+    const results = await env.installer.install(resolvedSkills, {
       agent: agentFlag,
     });
 

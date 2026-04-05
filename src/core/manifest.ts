@@ -1,5 +1,5 @@
 import { FileSystem, SkillDescriptor, SkillLockfile, SkillManifest } from './types';
-import { getLockfilePath, getManifestPath, schemaRelativePath, getSkillsInstallPath } from './config';
+import { getLockfilePath, getManifestPath, schemaUrl, getSkillsInstallPath } from './config';
 import { normalizeDescriptor } from './repos';
 import { LockfileNotFoundError, ManifestNotFoundError } from './errors';
 
@@ -35,7 +35,7 @@ export class ManifestRepository {
     } catch (error) {
       if (error instanceof ManifestNotFoundError) {
         return {
-          $schema: schemaRelativePath(),
+          $schema: schemaUrl(),
           skills: [],
         };
       }
@@ -46,7 +46,7 @@ export class ManifestRepository {
   async writeManifest(manifest: SkillManifest): Promise<void> {
     const enriched = this.normalizeManifest({ ...manifest });
     if (!enriched.$schema) {
-      enriched.$schema = schemaRelativePath();
+      enriched.$schema = schemaUrl();
     }
     await this.fs.writeJson(getManifestPath(this.cwd), enriched);
   }

@@ -1,12 +1,14 @@
 import os from 'node:os';
 import path from 'node:path';
 import { repoCacheKey } from './repos';
+import packageJson from '../../package.json';
 
 const SKILLETON_DIR_NAME = '.skilleton';
 const SKILL_CACHE_DIR = 'cache';
 const SKILL_INSTALL_DIR = 'skills';
 export const MANIFEST_FILENAME = 'skilleton.json';
 export const LOCKFILE_FILENAME = 'skilleton.lock.json';
+const SCHEMA_BASENAME = MANIFEST_FILENAME.replace('.json', '.schema.json');
 
 export function getManifestPath(cwd: string = process.cwd()): string {
   return path.join(cwd, MANIFEST_FILENAME);
@@ -36,6 +38,6 @@ export function getRepoCachePath(repo: string): string {
   return path.join(getCacheRoot(), repoCacheKey(repo));
 }
 
-export function schemaRelativePath(): string {
-  return `./${MANIFEST_FILENAME.replace('.json', '.schema.json')}`;
+export function schemaUrl(): string {
+  return `https://raw.githubusercontent.com/Fcmam5/skilleton/v${packageJson.version}/${SCHEMA_BASENAME}`;
 }
