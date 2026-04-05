@@ -47,5 +47,10 @@ export function getRepoCachePath(repo: string): string {
 
 /** Returns the remote JSON schema URL for the current package version. */
 export function schemaUrl(): string {
-  return `https://raw.githubusercontent.com/Fcmam5/skilleton/v${packageJson.version}/${SCHEMA_BASENAME}`;
+  const version = packageJson.version;
+  // For prerelease versions, use stable main branch to avoid non-existent tags
+  if (version.includes('-')) {
+    return `https://raw.githubusercontent.com/Fcmam5/skilleton/main/${SCHEMA_BASENAME}`;
+  }
+  return `https://raw.githubusercontent.com/Fcmam5/skilleton/v${version}/${SCHEMA_BASENAME}`;
 }

@@ -13,7 +13,7 @@ module.exports = [
       parser: tseslint.parser,
       parserOptions: {
         ecmaVersion: 'latest',
-        sourceType: 'commonjs',
+        sourceType: 'module',
       },
     },
     rules: {

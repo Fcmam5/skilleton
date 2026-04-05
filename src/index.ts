@@ -20,12 +20,8 @@ export { GitRefResolver } from './core/git-ref-resolver';
 export { NodeFileSystem } from './core/filesystem';
 
 export { parseSkillInput } from './core/parse';
-export {
-  serializeLockfile,
-  getChangedSkills,
-  pruneLockfile,
-  reconcileLockfile,
-} from './core/lock';
+export { serializeLockfile, getChangedSkills, pruneLockfile, reconcileLockfile } from './core/lock';
+export type { ReconcileLockfileResult } from './core/lock';
 export { ensureRepoUrl, normalizeRepoUrl, isRepoUrl, normalizeDescriptor, repoCacheKey } from './core/repos';
 export {
   getManifestPath,
@@ -39,12 +35,7 @@ export {
 } from './core/config';
 export { Logger } from './core/logger';
 
-export {
-  LockfileNotFoundError,
-  ManifestNotFoundError,
-  SkillValidationError,
-  SkillInstallError,
-} from './core/errors';
+export { LockfileNotFoundError, ManifestNotFoundError, SkillValidationError, SkillInstallError } from './core/errors';
 
 export type {
   SkillDescriptor,

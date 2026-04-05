@@ -21,7 +21,7 @@ describe('GitRefResolver', () => {
     it('resolves a branch name via git ls-remote', async () => {
       mockRunner.mockResolvedValue({
         stdout: 'abc123def456789012345678901234567890abcd\trefs/heads/main\n',
-      } as unknown as { stdout: string });
+      });
       const result = await resolver.resolve('https://github.com/owner/repo', 'main');
       expect(result).toBe('abc123def456789012345678901234567890abcd');
       expect(mockRunner).toHaveBeenCalledWith('git', [
@@ -37,7 +37,7 @@ describe('GitRefResolver', () => {
     it('resolves a tag name via git ls-remote', async () => {
       mockRunner.mockResolvedValue({
         stdout: 'fedcba098765432109876543210987654321fedc\trefs/tags/v1.2.3\n',
-      } as unknown as { stdout: string });
+      });
       const result = await resolver.resolve('owner/repo', 'v1.2.3');
       expect(result).toBe('fedcba098765432109876543210987654321fedc');
     });
@@ -45,7 +45,7 @@ describe('GitRefResolver', () => {
     it('resolves a full ref via git ls-remote', async () => {
       mockRunner.mockResolvedValue({
         stdout: '1234567890abcdef1234567890abcdef12345678\trefs/heads/feature/test\n',
-      } as unknown as { stdout: string });
+      });
       const result = await resolver.resolve('git@github.com:owner/repo.git', 'refs/heads/feature/test');
       expect(result).toBe('1234567890abcdef1234567890abcdef12345678');
     });

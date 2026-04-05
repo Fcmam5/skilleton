@@ -8,12 +8,5 @@
   "sort": ["source-order"],
   "categorizeByGroup": true,
   "defaultCategory": "Other",
-  "categoryOrder": [
-    "Environment",
-    "Commands",
-    "Core",
-    "Adapters",
-    "Types",
-    "*"
-  ]
+  "categoryOrder": ["Environment", "Commands", "Core", "Adapters", "Types", "*"]
 }

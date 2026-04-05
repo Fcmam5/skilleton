@@ -14,10 +14,13 @@ async function defaultRunner(_cmd: string, _args: string[]): Promise<{ stdout: s
 /**
  * Resolves Git refs (branches, tags, SHAs) to full commit SHAs using `git ls-remote`.
  * Supports both full and short SHA prefixes.
- * @param gitBinary The git binary to use (default: 'git')
- * @param run The execa runner to use (default: defaultRunner)
  */
 export class GitRefResolver {
+  /**
+   * Creates a new GitRefResolver.
+   * @param gitBinary The git binary to use (default: 'git')
+   * @param run The execa runner to use (default: defaultRunner)
+   */
   constructor(
     private readonly _gitBinary: string = 'git',
     private readonly _run: ExecaRunner = defaultRunner,

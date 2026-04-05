@@ -10,8 +10,8 @@ export interface CommandArgs {
 export interface Command {
   /**
    * Executes the command.
-   * @param _env Runtime environment with initialized services.
-   * @param _args Parsed command arguments.
+   * @param env Runtime environment with initialized services.
+   * @param args Parsed command arguments.
    */
-  run(_env: SkilletonEnvironment, _args: CommandArgs): Promise<void>;
+  run(env: SkilletonEnvironment, args: CommandArgs): Promise<void>;
 }

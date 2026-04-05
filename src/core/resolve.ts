@@ -10,7 +10,7 @@ export interface ResolveOptions {
 
 /** Resolves skill descriptors into locked skills with commit SHAs. */
 export class SkillResolver {
-  constructor(private readonly _refResolver: GitRefResolver) {}
+  constructor(private readonly refResolver: GitRefResolver) {}
 
   /**
    * Resolves all descriptors, reusing matching lockfile entries when possible.
@@ -36,7 +36,7 @@ export class SkillResolver {
         throw new SkillValidationError(`Skill ${descriptor.name} missing from lockfile. Run "skilleton update".`);
       }
 
-      const commit = await this._refResolver.resolve(descriptor.repo, descriptor.ref);
+      const commit = await this.refResolver.resolve(descriptor.repo, descriptor.ref);
       resolved.push({
         ...descriptor,
         commit,
