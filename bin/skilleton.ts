@@ -53,9 +53,16 @@ function parseArgs(argv: string[]): { command: string | null; args: CommandArgs 
   return { command, args: { positional, flags } };
 }
 
-function printHelp(): void {
+function printHelp(command?: string): void {
+  if (command === 'add') {
+    console.log(
+      `Add a skill to your project\n\nUsage:\n  skilleton add <owner/skill[@ref]>\n\nArguments:\n  <owner/skill[@ref]>    Skill identifier (required)\n\nExamples:\n  # Add from monorepo\n  skilleton add mindrally/skills/jest\n\n  # Add from root repository\n  skilleton add mhdcodes/react-query-skill\n\n  # Add specific ref\n  skilleton add mindrally/skills/jest@main\n\n  # Add with explicit URL\n  skilleton add https://github.com/owner/repo/path/to/skill\n\nThis command:\n  1. Parses the skill identifier\n  2. Adds the skill to skilleton.json\n  3. Runs 'skilleton install' to fetch and lock the skill\n`,
+    );
+    return;
+  }
+
   console.log(
-    `Skilleton — Skills Skeleton\n\nUsage:\n  skilleton <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skilleton.json\n  install [--agent <name>]    Install skills defined in skilleton.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list                        Show declared skills and pinned commits\n  describe <skill-name>       Inspect a skill's metadata and installed contents\n  audit                       Placeholder for future audit functionality\n\nRun "skilleton <command> --help" for details.\n`,
+    `Skilleton — Skills Skeleton\n\nUsage:\n  skilleton <command> [options]\n\nCommands:\n  add <owner/skill[@ref]>     Add a skill to skilleton.json\n  install [--agent <name>]    Install skills defined in skilleton.json\n  update [--agent <name>]     Refresh lockfile and reinstall changed skills\n  list [--format=table|json] Show declared skills and pinned commits\n  describe <skill-name>       Inspect a skill's metadata and installed contents\n  audit                       Placeholder for future audit functionality\n\nRun "skilleton <command> --help" for details.\n`,
   );
 }
 
@@ -65,6 +72,12 @@ async function main(): Promise<void> {
 
   if (!command || command === '--help' || command === '-h') {
     printHelp();
+    return;
+  }
+
+  // Handle individual command help
+  if (args.flags.help || args.flags.h) {
+    printHelp(command);
     return;
   }
 

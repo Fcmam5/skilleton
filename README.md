@@ -25,6 +25,35 @@ git pull  # Gets skilleton.json + skilleton.lock.json
 skilleton install  # Installs exact pinned versions
 ```
 
+## Skill input formats
+
+Skilleton supports several ways to specify skills:
+
+### Root repository skills
+For skills that live at the root of a repository:
+
+```bash
+skilleton add mhdcodes/react-query-skill
+# => repo: https://github.com/mhdcodes/react-query-skill, path: .
+```
+
+### Monorepo skills
+For skills inside a monorepo, make the subpath explicit:
+
+```bash
+# Three-segment shorthand
+skilleton add mindrally/skills/jest
+# => repo: https://github.com/mindrally/skills, path: jest
+
+# Longer paths in monorepos
+skilleton add owner/monorepo/path/to/skill
+# => repo: https://github.com/owner/monorepo, path: path/to/skill
+
+# Explicit URL form
+skilleton add https://github.com/owner/monorepo/path/to/skill
+# => repo: https://github.com/owner/monorepo, path: path/to/skill
+```
+
 > **Note**: Skilleton resolves skill refs via `git ls-remote` and requires a local git installation. It respects your local git credentials for private repositories.
 
 ## How it works
@@ -75,7 +104,7 @@ skilleton install                    # Reconcile lockfile with manifest, then in
 skilleton update                     # Refresh lockfile; reinstall only changed skills
 skilleton list [--format=table|json] # Show installed skills
 skilleton describe <skill>           # Inspect metadata, install tree, SKILL.md header
-skilleton validate                   # Check skill structure and security
+skilleton audit                      # Placeholder for future audit functionality
 ```
 
 ### Programmatic usage
@@ -83,7 +112,7 @@ skilleton validate                   # Check skill structure and security
 Skilleton can also be used from scripts via the package API:
 
 ```js
-const { createEnvironment, AddCommand, InstallCommand } = require('skilleton');
+import { createEnvironment, AddCommand, InstallCommand } from 'skilleton';
 
 async function run() {
   const env = createEnvironment(process.cwd());
