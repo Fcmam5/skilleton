@@ -17,6 +17,8 @@ describe('ExecaGitClient security hardening', () => {
     mockedFs.remove.mockResolvedValue(undefined);
     mockedFs.copy.mockResolvedValue(undefined);
     mockedFs.mkdtemp.mockResolvedValue('/tmp/skilleton-wt-123');
+    mockedFs.readDir.mockResolvedValue([]);
+    mockedFs.isSymlink.mockResolvedValue(false);
     mockedExeca.mockResolvedValue({ stdout: '', stderr: '' });
   });
 
@@ -145,5 +147,83 @@ describe('ExecaGitClient security hardening', () => {
       expect.any(Object),
     );
     expect(mockedFs.remove).toHaveBeenCalledWith('/tmp/skilleton-wt-123');
+  });
+
+  it('rejects a file symlink in skill content that escapes the skill root via absolute target', async () => {
+    const client = new ExecaGitClient('/tmp/cache', mockedFs);
+    const commit = 'abcdef1234567890abcdef1234567890abcdef12';
+    const skillPath = '/tmp/skilleton-wt-123';
+
+    mockedFs.readDir.mockImplementation(async (dir: string) => {
+      if (dir === skillPath) return ['SKILL.md', 'stolen-key'];
+      return [];
+    });
+    mockedFs.isSymlink.mockImplementation(async (p: string) => p === `${skillPath}/stolen-key`);
+    mockedFs.readlink.mockImplementation(async () => '/home/victim/.ssh/id_rsa');
+
+    await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', '.')).rejects.toThrow(
+      'Symlink in skill content escapes the skill root: stolen-key -> /home/victim/.ssh/id_rsa',
+    );
+
+    expect(mockedFs.copy).not.toHaveBeenCalled();
+  });
+
+  it('rejects a directory symlink in skill content that escapes the skill root', async () => {
+    const client = new ExecaGitClient('/tmp/cache', mockedFs);
+    const commit = 'abcdef1234567890abcdef1234567890abcdef12';
+    const skillPath = '/tmp/skilleton-wt-123';
+
+    mockedFs.readDir.mockImplementation(async (dir: string) => {
+      if (dir === skillPath) return ['SKILL.md', 'loot'];
+      return [];
+    });
+    mockedFs.isSymlink.mockImplementation(async (p: string) => p === `${skillPath}/loot`);
+    mockedFs.readlink.mockImplementation(async () => '/home/victim');
+
+    await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', '.')).rejects.toThrow(
+      'Symlink in skill content escapes the skill root: loot -> /home/victim',
+    );
+
+    expect(mockedFs.copy).not.toHaveBeenCalled();
+  });
+
+  it('rejects an escaping symlink inside a subdirectory of the skill', async () => {
+    const client = new ExecaGitClient('/tmp/cache', mockedFs);
+    const commit = 'abcdef1234567890abcdef1234567890abcdef12';
+    const skillPath = '/tmp/skilleton-wt-123';
+
+    mockedFs.readDir.mockImplementation(async (dir: string) => {
+      if (dir === skillPath) return ['SKILL.md', 'subdir'];
+      if (dir === `${skillPath}/subdir`) return ['nested-link'];
+      return [];
+    });
+    mockedFs.isSymlink.mockImplementation(async (p: string) => p === `${skillPath}/subdir/nested-link`);
+    mockedFs.isDirectory.mockImplementation(async (p: string) => p === `${skillPath}/subdir`);
+    mockedFs.readlink.mockImplementation(async () => '../../../../etc/passwd');
+
+    await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', '.')).rejects.toThrow(
+      'Symlink in skill content escapes the skill root: nested-link -> ../../../../etc/passwd',
+    );
+
+    expect(mockedFs.copy).not.toHaveBeenCalled();
+  });
+
+  it('allows relative symlinks that stay within the skill root', async () => {
+    const client = new ExecaGitClient('/tmp/cache', mockedFs);
+    const commit = 'abcdef1234567890abcdef1234567890abcdef12';
+    const skillPath = '/tmp/skilleton-wt-123';
+
+    mockedFs.readDir.mockImplementation(async (dir: string) => {
+      if (dir === skillPath) return ['SKILL.md', 'docs', 'internal-link'];
+      if (dir === `${skillPath}/docs`) return [];
+      return [];
+    });
+    mockedFs.isSymlink.mockImplementation(async (p: string) => p === `${skillPath}/internal-link`);
+    mockedFs.isDirectory.mockImplementation(async (p: string) => p === `${skillPath}/docs`);
+    mockedFs.readlink.mockImplementation(async () => './docs');
+
+    await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', '.')).resolves.toBeUndefined();
+
+    expect(mockedFs.copy).toHaveBeenCalledWith(skillPath, '/tmp/out');
   });
 });

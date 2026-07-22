@@ -19,6 +19,26 @@ function assertSafeGitArg(value: string, label: string): void {
   }
 }
 
+// Walks `dir` recursively and throws if any symlink's resolved target escapes `root`.
+// Checks only one level of readlink (the raw link target) — this is intentional: we want
+// to reject the link itself, not follow chains into the worktree.
+async function assertNoEscapingSymlinks(fileSystem: FileSystem, root: string, dir: string): Promise<void> {
+  const entries = await fileSystem.readDir(dir);
+  for (const name of entries) {
+    const entryPath = path.join(dir, name);
+    if (await fileSystem.isSymlink(entryPath)) {
+      const target = await fileSystem.readlink(entryPath);
+      const resolved = path.resolve(path.dirname(entryPath), target);
+      const relative = path.relative(root, resolved);
+      if (relative.startsWith('..') || path.isAbsolute(relative)) {
+        throw new SkillInstallError(`Symlink in skill content escapes the skill root: ${name} -> ${target}`);
+      }
+    } else if (await fileSystem.isDirectory(entryPath)) {
+      await assertNoEscapingSymlinks(fileSystem, root, entryPath);
+    }
+  }
+}
+
 // Resolves a sub-path relative to a base directory, ensuring it stays within the base.
 // Rejects absolute paths and paths that would escape the base directory.
 function resolveSafeSubPath(baseDir: string, subPath?: string): string {
@@ -115,6 +135,8 @@ export class ExecaGitClient implements GitClient {
       if (!(await this.fs.pathExists(sourcePath))) {
         throw new SkillInstallError(`Skill path ${subPath ?? '.'} not found in repository ${repoPath}`);
       }
+
+      await assertNoEscapingSymlinks(this.fs, sourcePath, sourcePath);
 
       await this.fs.remove(destination);
       await this.fs.copy(sourcePath, destination);

@@ -4,6 +4,7 @@ import { FileSystem } from '../../src/core/types';
 export class MockedFileSystem implements FileSystem {
   private directories = new Set<string>();
   private files = new Map<string, string>();
+  private symlinks = new Map<string, string>();
   private tempCounter = 0;
 
   constructor() {
@@ -18,6 +19,12 @@ export class MockedFileSystem implements FileSystem {
     const normalized = this.normalize(target);
     this.addDirectoryTree(path.dirname(normalized));
     this.files.set(normalized, content);
+  }
+
+  addSymlink(dest: string, target: string): void {
+    const normalizedDest = this.normalize(dest);
+    this.addDirectoryTree(path.dirname(normalizedDest));
+    this.symlinks.set(normalizedDest, target);
   }
 
   pathExists = jest.fn(async (target: string): Promise<boolean> => {
@@ -113,11 +120,11 @@ export class MockedFileSystem implements FileSystem {
     throw new Error(`Path not found: ${src}`);
   });
 
-  symlink = jest.fn(async (_target: string, dest: string): Promise<void> => {
+  symlink = jest.fn(async (target: string, dest: string): Promise<void> => {
     const normalizedDest = this.normalize(dest);
     this.files.delete(normalizedDest);
     this.addDirectoryTree(path.dirname(normalizedDest));
-    this.files.set(normalizedDest, '');
+    this.symlinks.set(normalizedDest, target);
   });
 
   readDir = jest.fn(async (target: string): Promise<string[]> => {
@@ -150,6 +157,19 @@ export class MockedFileSystem implements FileSystem {
     }
 
     return Array.from(entries);
+  });
+
+  isSymlink = jest.fn(async (target: string): Promise<boolean> => {
+    return this.symlinks.has(this.normalize(target));
+  });
+
+  readlink = jest.fn(async (target: string): Promise<string> => {
+    const normalized = this.normalize(target);
+    const linkTarget = this.symlinks.get(normalized);
+    if (linkTarget === undefined) {
+      throw new Error(`Not a symlink: ${target}`);
+    }
+    return linkTarget;
   });
 
   private normalize(target: string): string {

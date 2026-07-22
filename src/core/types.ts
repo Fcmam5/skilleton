@@ -53,4 +53,6 @@ export interface FileSystem {
   copy(_src: string, _dest: string): Promise<void>;
   symlink(_target: string, _path: string): Promise<void>;
   readDir(_path: string): Promise<string[]>;
+  isSymlink(_path: string): Promise<boolean>;
+  readlink(_path: string): Promise<string>;
 }

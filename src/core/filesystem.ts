@@ -118,4 +118,25 @@ export class NodeFileSystem implements FileSystem {
   async readDir(target: string): Promise<string[]> {
     return fs.readdir(target);
   }
+
+  /**
+   * Checks whether a path is a symbolic link (does not follow the link).
+   * @param target Path to inspect.
+   */
+  async isSymlink(target: string): Promise<boolean> {
+    try {
+      const stats = await fs.lstat(target);
+      return stats.isSymbolicLink();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Reads the target of a symbolic link.
+   * @param target Symlink path.
+   */
+  async readlink(target: string): Promise<string> {
+    return fs.readlink(target);
+  }
 }
