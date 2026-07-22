@@ -146,7 +146,7 @@ export class ExecaGitClient implements GitClient {
         throw new SkillInstallError(`Skill path ${subPath ?? '.'} escapes the repository worktree`);
       }
 
-      await assertNoEscapingSymlinks(this.fs, realSourcePath, sourcePath);
+      await assertNoEscapingSymlinks(this.fs, realSourcePath, realSourcePath);
 
       await this.fs.remove(destination);
       await this.fs.copy(sourcePath, destination);
