@@ -31,6 +31,7 @@
     "lint": "eslint --config eslint.config.cjs . --ext .ts",
     "lint:fix": "npm run lint -- --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "docs": "typedoc",
     "prepack": "npm run build"
   },

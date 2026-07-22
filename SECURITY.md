@@ -2,9 +2,9 @@
 
 ## Supported Versions
 
-| Version | Supported |
-| ------- | --------- |
-| >=0.3.2 | ✅        |
+| Version | Supported       |
+| ------- | --------------- |
+| >=0.3.2 | ✅              |
 | <0.3.2  | ❌ (deprecated) |
 
 Versions earlier than `0.3.2` are deprecated due to security fixes. Please upgrade to `0.3.2` or later.

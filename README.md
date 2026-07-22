@@ -30,6 +30,7 @@ skilleton install  # Installs exact pinned versions
 Skilleton supports several ways to specify skills:
 
 ### Root repository skills
+
 For skills that live at the root of a repository:
 
 ```bash
@@ -38,6 +39,7 @@ skilleton add mhdcodes/react-query-skill
 ```
 
 ### Monorepo skills
+
 For skills inside a monorepo, make the subpath explicit:
 
 ```bash
