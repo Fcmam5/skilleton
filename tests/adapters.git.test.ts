@@ -338,10 +338,23 @@ describe('ExecaGitClient security hardening', () => {
     expect(mockedFs.copy).toHaveBeenCalledWith(skillPath, '/tmp/out');
   });
 
+  it('copies from realSourcePath when subPath is a directory symlink inside the worktree', async () => {
+    const client = new ExecaGitClient('/tmp/cache', mockedFs);
+    const commit = 'abcdef1234567890abcdef1234567890abcdef12';
+
+    mockedFs.realpath.mockImplementation(async (p: string) => {
+      if (p === '/tmp/skilleton-wt-123/skills/jest') return '/tmp/skilleton-wt-123/actual-jest';
+      return p;
+    });
+
+    await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', 'skills/jest')).resolves.toBeUndefined();
+
+    expect(mockedFs.copy).toHaveBeenCalledWith('/tmp/skilleton-wt-123/actual-jest', '/tmp/out');
+  });
+
   it('allows relative in-root symlinks when TMPDIR is itself a symlink (macOS /tmp -> /private/tmp)', async () => {
     const client = new ExecaGitClient('/tmp/cache', mockedFs);
     const commit = 'abcdef1234567890abcdef1234567890abcdef12';
-    const logicalPath = '/tmp/skilleton-wt-123';
     const canonicalPath = '/private/tmp/skilleton-wt-123';
 
     mockedFs.realpath.mockImplementation(async (p: string) => p.replace(/^\/tmp\//, '/private/tmp/'));
@@ -357,6 +370,6 @@ describe('ExecaGitClient security hardening', () => {
 
     await expect(client.exportPath('/tmp/cache/repo', commit, '/tmp/out', '.')).resolves.toBeUndefined();
 
-    expect(mockedFs.copy).toHaveBeenCalledWith(logicalPath, '/tmp/out');
+    expect(mockedFs.copy).toHaveBeenCalledWith(canonicalPath, '/tmp/out');
   });
 });

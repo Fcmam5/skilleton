@@ -149,7 +149,7 @@ export class ExecaGitClient implements GitClient {
       await assertNoEscapingSymlinks(this.fs, realSourcePath, realSourcePath);
 
       await this.fs.remove(destination);
-      await this.fs.copy(sourcePath, destination);
+      await this.fs.copy(realSourcePath, destination);
     } catch (error) {
       throw new SkillInstallError(
         `Failed to export ${subPath ?? '.'} from ${repoPath}@${commit}: ${(error as Error).message}`,
