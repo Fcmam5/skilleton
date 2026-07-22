@@ -4,10 +4,13 @@
 
 | Version | Supported |
 | ------- | --------- |
-| >=0.3.1 | ✅        |
-| <0.3.1  | ❌ (deprecated) |
+| >=0.3.2 | ✅        |
+| <0.3.2  | ❌ (deprecated) |
 
-Versions earlier than `0.3.1` are deprecated due to security fixes (see the [Security Advisory](https://github.com/Fcmam5/skilleton/security/advisories/GHSA-5g3j-89fr-r2vp)). Please upgrade to `0.3.1` or later.
+Versions earlier than `0.3.2` are deprecated due to security fixes. Please upgrade to `0.3.2` or later.
+
+- `<0.3.1` — see [GHSA-5g3j-89fr-r2vp](https://github.com/Fcmam5/skilleton/security/advisories/GHSA-5g3j-89fr-r2vp)
+- `0.3.1` — symlink escape in skill install path (CWE-59); fixed in 0.3.2 — see [GHSA-mhq5-96gj-34gm](https://github.com/Fcmam5/skilleton/security/advisories/GHSA-mhq5-96gj-34gm), reported by [@EchoSkorJjj](https://github.com/EchoSkorJjj)
 
 ## Reporting a Vulnerability
 

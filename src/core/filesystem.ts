@@ -95,7 +95,7 @@ export class NodeFileSystem implements FileSystem {
    */
   async copy(src: string, dest: string): Promise<void> {
     await this.ensureDir(path.dirname(dest));
-    await fs.cp(src, dest, { recursive: true });
+    await fs.cp(src, dest, { recursive: true, dereference: false });
   }
 
   /**
