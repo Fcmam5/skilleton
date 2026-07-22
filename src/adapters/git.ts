@@ -19,6 +19,29 @@ function assertSafeGitArg(value: string, label: string): void {
   }
 }
 
+// Walks `dir` recursively and throws if any symlink's resolved target escapes `root`.
+// Checks only one level of readlink (the raw link target) — this is intentional: we want
+// to reject the link itself, not follow chains into the worktree.
+async function assertNoEscapingSymlinks(fileSystem: FileSystem, root: string, dir: string): Promise<void> {
+  const entries = await fileSystem.readDir(dir);
+  for (const name of entries) {
+    const entryPath = path.join(dir, name);
+    if (await fileSystem.isSymlink(entryPath)) {
+      const target = await fileSystem.readlink(entryPath);
+      if (path.isAbsolute(target)) {
+        throw new SkillInstallError(`Symlink in skill content uses an absolute target: ${name} -> ${target}`);
+      }
+      const resolved = path.resolve(path.dirname(entryPath), target);
+      const relative = path.relative(root, resolved);
+      if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) {
+        throw new SkillInstallError(`Symlink in skill content escapes the skill root: ${name} -> ${target}`);
+      }
+    } else if (await fileSystem.isDirectory(entryPath)) {
+      await assertNoEscapingSymlinks(fileSystem, root, entryPath);
+    }
+  }
+}
+
 // Resolves a sub-path relative to a base directory, ensuring it stays within the base.
 // Rejects absolute paths and paths that would escape the base directory.
 function resolveSafeSubPath(baseDir: string, subPath?: string): string {
@@ -32,7 +55,7 @@ function resolveSafeSubPath(baseDir: string, subPath?: string): string {
 
   const normalized = path.resolve(baseDir, subPath);
   const relativeToBase = path.relative(baseDir, normalized);
-  if (relativeToBase.startsWith('..') || path.isAbsolute(relativeToBase)) {
+  if (relativeToBase === '..' || relativeToBase.startsWith('..' + path.sep) || path.isAbsolute(relativeToBase)) {
     throw new SkillInstallError(`Invalid skill path ${subPath}`);
   }
 
@@ -116,8 +139,17 @@ export class ExecaGitClient implements GitClient {
         throw new SkillInstallError(`Skill path ${subPath ?? '.'} not found in repository ${repoPath}`);
       }
 
+      const realWorktreeDir = await this.fs.realpath(worktreeDir);
+      const realSourcePath = await this.fs.realpath(sourcePath);
+      const rootRel = path.relative(realWorktreeDir, realSourcePath);
+      if (rootRel !== '' && (rootRel === '..' || rootRel.startsWith('..' + path.sep) || path.isAbsolute(rootRel))) {
+        throw new SkillInstallError(`Skill path ${subPath ?? '.'} escapes the repository worktree`);
+      }
+
+      await assertNoEscapingSymlinks(this.fs, realSourcePath, realSourcePath);
+
       await this.fs.remove(destination);
-      await this.fs.copy(sourcePath, destination);
+      await this.fs.copy(realSourcePath, destination);
     } catch (error) {
       throw new SkillInstallError(
         `Failed to export ${subPath ?? '.'} from ${repoPath}@${commit}: ${(error as Error).message}`,

@@ -95,7 +95,7 @@ export class NodeFileSystem implements FileSystem {
    */
   async copy(src: string, dest: string): Promise<void> {
     await this.ensureDir(path.dirname(dest));
-    await fs.cp(src, dest, { recursive: true });
+    await fs.cp(src, dest, { recursive: true, dereference: false });
   }
 
   /**
@@ -117,5 +117,34 @@ export class NodeFileSystem implements FileSystem {
    */
   async readDir(target: string): Promise<string[]> {
     return fs.readdir(target);
+  }
+
+  /**
+   * Checks whether a path is a symbolic link (does not follow the link).
+   * @param target Path to inspect.
+   */
+  async isSymlink(target: string): Promise<boolean> {
+    try {
+      const stats = await fs.lstat(target);
+      return stats.isSymbolicLink();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Reads the target of a symbolic link.
+   * @param target Symlink path.
+   */
+  async readlink(target: string): Promise<string> {
+    return fs.readlink(target);
+  }
+
+  /**
+   * Resolves the canonical absolute path, following all symlinks.
+   * @param target Path to resolve.
+   */
+  async realpath(target: string): Promise<string> {
+    return fs.realpath(target);
   }
 }
