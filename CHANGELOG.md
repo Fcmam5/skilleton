@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `realpath` containment check to reject symlinked skill root directories and symlinked intermediate `subPath` components that escape the repository worktree.
 - Rejected absolute symlink targets outright to prevent dangling symlinks into predictable temp paths after worktree cleanup.
 - Fixed `startsWith('..')` false positive in path escape checks that incorrectly rejected filenames beginning with `..` (e.g. `..config`).
+- Copy skill content from canonical `realSourcePath` instead of the logical `sourcePath` to avoid installing a dangling symlink when `subPath` itself is a directory symlink.
 
 ## [0.3.1] - 2026-04-05
 
