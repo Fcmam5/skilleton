@@ -55,4 +55,5 @@ export interface FileSystem {
   readDir(_path: string): Promise<string[]>;
   isSymlink(_path: string): Promise<boolean>;
   readlink(_path: string): Promise<string>;
+  realpath(_path: string): Promise<string>;
 }

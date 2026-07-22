@@ -139,4 +139,12 @@ export class NodeFileSystem implements FileSystem {
   async readlink(target: string): Promise<string> {
     return fs.readlink(target);
   }
+
+  /**
+   * Resolves the canonical absolute path, following all symlinks.
+   * @param target Path to resolve.
+   */
+  async realpath(target: string): Promise<string> {
+    return fs.realpath(target);
+  }
 }

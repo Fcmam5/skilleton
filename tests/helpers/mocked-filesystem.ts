@@ -159,6 +159,10 @@ export class MockedFileSystem implements FileSystem {
     return Array.from(entries);
   });
 
+  realpath = jest.fn(async (target: string): Promise<string> => {
+    return target;
+  });
+
   isSymlink = jest.fn(async (target: string): Promise<boolean> => {
     return this.symlinks.has(this.normalize(target));
   });

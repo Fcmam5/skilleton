@@ -28,9 +28,12 @@ async function assertNoEscapingSymlinks(fileSystem: FileSystem, root: string, di
     const entryPath = path.join(dir, name);
     if (await fileSystem.isSymlink(entryPath)) {
       const target = await fileSystem.readlink(entryPath);
+      if (path.isAbsolute(target)) {
+        throw new SkillInstallError(`Symlink in skill content uses an absolute target: ${name} -> ${target}`);
+      }
       const resolved = path.resolve(path.dirname(entryPath), target);
       const relative = path.relative(root, resolved);
-      if (relative.startsWith('..') || path.isAbsolute(relative)) {
+      if (relative === '..' || relative.startsWith('..' + path.sep) || path.isAbsolute(relative)) {
         throw new SkillInstallError(`Symlink in skill content escapes the skill root: ${name} -> ${target}`);
       }
     } else if (await fileSystem.isDirectory(entryPath)) {
@@ -52,7 +55,7 @@ function resolveSafeSubPath(baseDir: string, subPath?: string): string {
 
   const normalized = path.resolve(baseDir, subPath);
   const relativeToBase = path.relative(baseDir, normalized);
-  if (relativeToBase.startsWith('..') || path.isAbsolute(relativeToBase)) {
+  if (relativeToBase === '..' || relativeToBase.startsWith('..' + path.sep) || path.isAbsolute(relativeToBase)) {
     throw new SkillInstallError(`Invalid skill path ${subPath}`);
   }
 
@@ -136,7 +139,14 @@ export class ExecaGitClient implements GitClient {
         throw new SkillInstallError(`Skill path ${subPath ?? '.'} not found in repository ${repoPath}`);
       }
 
-      await assertNoEscapingSymlinks(this.fs, sourcePath, sourcePath);
+      const realWorktreeDir = await this.fs.realpath(worktreeDir);
+      const realSourcePath = await this.fs.realpath(sourcePath);
+      const rootRel = path.relative(realWorktreeDir, realSourcePath);
+      if (rootRel !== '' && (rootRel === '..' || rootRel.startsWith('..' + path.sep) || path.isAbsolute(rootRel))) {
+        throw new SkillInstallError(`Skill path ${subPath ?? '.'} escapes the repository worktree`);
+      }
+
+      await assertNoEscapingSymlinks(this.fs, realSourcePath, sourcePath);
 
       await this.fs.remove(destination);
       await this.fs.copy(sourcePath, destination);
