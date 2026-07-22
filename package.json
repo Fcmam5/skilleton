@@ -1,9 +1,17 @@
 {
   "name": "skilleton",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Skills skeleton: deterministic AI skill dependency manager",
   "type": "commonjs",
   "private": false,
+  "files": [
+    "dist/src",
+    "dist/bin",
+    "dist/skilleton.schema.json",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
